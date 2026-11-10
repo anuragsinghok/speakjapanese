@@ -208,6 +208,8 @@ svg .fill { fill: currentColor; stroke: none; }
   transition: opacity .25s;
 }
 .meaning .sep { color: var(--ink-3); }
+.meaning.stack { flex-direction: column; align-items: center; gap: 2px; }
+.meaning.stack .sep { display: none; }
 #hi { font-family: var(--hi); }
 .listen {
   margin-top: 12px;
@@ -421,10 +423,15 @@ kbd {
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-@media (max-width: 380px) {
-  .levels button { padding: 8px 14px; }
+@media (max-width: 400px) {
+  .levels button { padding: 8px 15px; }
   .durations button { padding: 8px 10px; font-size: .85rem; }
-  .btn { padding: 14px 22px; }
+  .actions { flex-wrap: nowrap; gap: 8px; }
+  .actions .btn { flex: 1 1 0; min-width: 0; padding: 14px 10px; font-size: .97rem; }
+  #spin { min-width: 0; }
+}
+@media (max-width: 360px) {
+  .byline > span:first-child { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

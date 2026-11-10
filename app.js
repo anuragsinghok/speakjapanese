@@ -31,6 +31,7 @@
   let current = null;
   let spinning = false;
   let spinToken = 0;
+  let loaded = false;
 
   // ── Handles / links ──────────────────────
   const igHandle = String(CFG.instagram || "").replace(/^@/, "").trim();
@@ -85,6 +86,7 @@
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
     data.filter(isValidWord).forEach((w) => byLevel[w.level].push(w));
+    loaded = true;
   }
 
   function shuffle(a) {
@@ -101,10 +103,8 @@
     if (!list.length) return null;
     if (list.length === 1) return list[0];
     if (!bags[lv] || !bags[lv].length) {
-      bags[lv] = shuffle(list.slice());
-      if (current && bags[lv][bags[lv].length - 1] === current) {
-        bags[lv].unshift(bags[lv].pop()); // don't repeat across refills
-      }
+      // Leave out the word on screen (word of the day / shared / last of previous bag)
+      bags[lv] = shuffle(list.filter((w) => w !== current));
     }
     return bags[lv].pop();
   }
@@ -113,7 +113,7 @@
     const list = byLevel[lv];
     if (!list.length) return null;
     const d = new Date();
-    const seed = d.getFullYear() * 1000 + Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5);
+    const seed = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
     return list[(seed * 2654435761 >>> 0) % list.length];
   }
 
@@ -142,6 +142,7 @@
     $("#en").textContent = w.en;
     $("#hi").textContent = w.hi || "";
     $("#meaning .sep").style.display = w.hi ? "" : "none";
+    $("#meaning").classList.toggle("stack", (w.en + (w.hi || "")).length > 24);
     const ul = $("#starters");
     ul.innerHTML = "";
     w.starters.slice(0, 3).forEach((s) => {
@@ -156,6 +157,7 @@
       ul.appendChild(li);
     });
     $("#startersCard").hidden = w.starters.length === 0;
+    if (timer.running) $("#timerMsg").textContent = `Talk about「${w.kanji}」— keep going!`;
     $("#announce").textContent = `${w.kanji}${w.kana && w.kana !== w.kanji ? ", " + w.kana : ""}: ${w.en}${w.hi ? ", " + w.hi : ""}`;
     updateUrl();
   }
@@ -175,6 +177,7 @@
   // ── Spin ─────────────────────────────────
   async function spin() {
     if (spinning) return;
+    if (!loaded) return toast("Loading words…");
     const target = nextWord(level);
     if (!target) return toast("No words for this level yet");
     const pool = byLevel[level];
@@ -227,10 +230,10 @@
   }
 
   // ── Level ────────────────────────────────
-  function setLevel(lv, { pick = true } = {}) {
+  function setLevel(lv, { pick = true, persist = true } = {}) {
     if (!LEVELS.includes(lv)) lv = "N5";
     level = lv;
-    store.set("level", lv);
+    if (persist) store.set("level", lv);
     $$(".levels button").forEach((b) => {
       const on = b.dataset.level === lv;
       b.setAttribute("aria-checked", String(on));
@@ -272,6 +275,8 @@
   const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
   let jaVoice = null;
   let speakingBtn = null;
+  let speakTimer = 0;
+  let currentUtter = null;
 
   function pickVoice() {
     if (!synth) return;
@@ -292,6 +297,8 @@
   }
 
   function stopSpeaking() {
+    clearTimeout(speakTimer);
+    currentUtter = null;
     if (synth) synth.cancel();
     markPlaying(speakingBtn, false);
     speakingBtn = null;
@@ -302,6 +309,7 @@
       return toast("Audio isn't supported in this browser");
     }
     if (!jaVoice) pickVoice();
+    const busy = synth.speaking || synth.pending;
     stopSpeaking();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "ja-JP";
@@ -309,11 +317,14 @@
     u.rate = 0.85;
     speakingBtn = btn || null;
     markPlaying(speakingBtn, true);
-    const done = () => { if (speakingBtn === btn) { markPlaying(btn, false); speakingBtn = null; } };
+    currentUtter = u;
+    const done = () => { if (currentUtter === u) { markPlaying(btn, false); speakingBtn = null; currentUtter = null; } };
     u.onend = done;
     u.onerror = done;
-    // Some engines (Chrome) need a tick after cancel()
-    setTimeout(() => synth.speak(u), 30);
+    // Speak inside the tap (iOS needs that). Only when something was playing
+    // do we wait a tick, because Chrome can drop speak() right after cancel().
+    if (busy) speakTimer = setTimeout(() => { if (currentUtter === u) synth.speak(u); }, 40);
+    else synth.speak(u);
     if (!jaVoice && synth.getVoices().length) {
       toast("No Japanese voice found — add one in your device's language settings");
     }
@@ -345,7 +356,7 @@
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       if (!audioCtx) audioCtx = new AC();
-      if (audioCtx.state === "suspended") audioCtx.resume();
+      if (audioCtx.state !== "running") audioCtx.resume();
       // iOS unlock: play a silent blip inside the user gesture
       const o = audioCtx.createOscillator(), g = audioCtx.createGain();
       g.gain.value = 0;
@@ -357,7 +368,7 @@
   function beep() {
     if (!audioCtx) return;
     try {
-      if (audioCtx.state === "suspended") audioCtx.resume();
+      if (audioCtx.state !== "running") audioCtx.resume();
       const t0 = audioCtx.currentTime + 0.05;
       [0, 0.28, 0.56].forEach((off, i) => {
         const o = audioCtx.createOscillator(), g = audioCtx.createGain();
@@ -373,15 +384,22 @@
     } catch { /* ignore */ }
   }
 
+  let wakeWanted = false;
   async function lockScreen(on) {
+    wakeWanted = on;
     try {
-      if (on && "wakeLock" in navigator && document.visibilityState === "visible") {
-        wakeLock = await navigator.wakeLock.request("screen");
-      } else if (!on && wakeLock) {
-        await wakeLock.release();
-        wakeLock = null;
+      if (!on) {
+        const l = wakeLock; wakeLock = null;
+        if (l) await l.release();
+        return;
       }
-    } catch { wakeLock = null; }
+      if (wakeLock && !wakeLock.released) return;
+      if (!("wakeLock" in navigator) || document.visibilityState !== "visible") return;
+      const l = await navigator.wakeLock.request("screen");
+      if (!wakeWanted) { l.release(); return; } // paused while we waited
+      if (wakeLock && wakeLock !== l) wakeLock.release();
+      wakeLock = l;
+    } catch { /* not allowed */ }
   }
 
   function tick() {
@@ -446,8 +464,9 @@
     track("timer-done");
   }
 
-  function setDuration(sec) {
+  function setDuration(sec, force = false) {
     sec = [30, 60, 180, 300].includes(sec) ? sec : 60;
+    if (sec === timer.total && !force) return;
     timer.total = sec;
     store.set("duration", sec);
     $$(".durations button").forEach((b) => {
@@ -463,7 +482,7 @@
   // Re-sync after the tab was hidden (intervals are throttled in background)
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
-      if (timer.running) { tick(); lockScreen(true); }
+      if (timer.running) { tick(); if (timer.running) lockScreen(true); }
     }
   });
 
@@ -509,7 +528,7 @@
   }
 
   // ── Email ────────────────────────────────
-  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const EMAIL_RE = /^[^\s@]+@([^\s@.]+\.)+[^\s@.]{2,}$/;
 
   function setupEmail() {
     const form = $("#emailForm"), input = $("#email"), msg = $("#formMsg"), btn = $("#emailBtn");
@@ -544,8 +563,13 @@
         body.append("email", email);
         body.append("fields[email]", email); // MailerLite field name
         body.append("source", "spin-and-speak");
-        const res = await fetch(endpoint, { method: "POST", body, headers: { Accept: "application/json" } });
-        if (!res.ok) throw new Error("HTTP " + res.status);
+        if (/formspree\.io|getform\.io|basin\.com/i.test(endpoint)) {
+          const res = await fetch(endpoint, { method: "POST", body, headers: { Accept: "application/json" } });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+        } else {
+          // MailerLite / Brevo form actions don't send CORS headers: fire-and-forget
+          await fetch(endpoint, { method: "POST", body, mode: "no-cors" });
+        }
         store.set("subscribed", true);
         form.reset();
         say("Done! Check your inbox (and spam folder) for the schedule 📅", "ok");
@@ -612,6 +636,7 @@
       const onControl = t && (t.tagName === "BUTTON" || t.tagName === "A");
       if ((e.code === "Space" || e.key === " ") && !onControl) {
         e.preventDefault();
+        if (e.repeat || $("#spin").disabled) return;
         spin();
       }
     });
@@ -621,13 +646,13 @@
     applyHandles();
     bind();
     setupEmail();
-    setDuration(Number(store.get("duration", 60)));
+    setDuration(Number(store.get("duration", 60)), true);
     loadAnalytics();
 
     const params = new URLSearchParams(location.search);
     const urlLevel = (params.get("level") || "").toUpperCase();
     const startLevel = LEVELS.includes(urlLevel) ? urlLevel : store.get("level", "N5");
-    setLevel(startLevel, { pick: false });
+    setLevel(startLevel, { pick: false, persist: !LEVELS.includes(urlLevel) });
 
     try {
       await loadWords();
@@ -642,7 +667,11 @@
     }
 
     const wanted = params.get("w");
-    const shared = wanted && byLevel[level].find((w) => w.kanji === wanted);
+    let shared = wanted && byLevel[level].find((w) => w.kanji === wanted);
+    if (wanted && !shared) {
+      shared = LEVELS.map((lv) => byLevel[lv].find((w) => w.kanji === wanted)).find(Boolean);
+      if (shared) setLevel(shared.level, { pick: false, persist: false });
+    }
     if (shared) {
       renderWord(shared);
       setStatus(`Shared word · ${level}`);
