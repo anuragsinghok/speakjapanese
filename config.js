@@ -3,8 +3,8 @@
 // ─────────────────────────────────────────────────────────────
 window.SPIN_CONFIG = {
   // Your handles, without the "@".
-  instagram: "yourhandle",
-  youtube: "yourhandle",
+  instagram: "anurag.pov",
+  youtube: "anuragsinghok",
 
   // Hashtag people should use (without "#").
   hashtag: "SpinAndSpeak",
