@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Spin &amp; Speak — Japanese speaking wheel</title>
+  <meta name="description" content="Spin a Japanese word, get starter phrases, and speak for 1 minute. Free JLPT N5–N2 speaking practice with English + Hindi meanings.">
+  <meta name="theme-color" content="#14110f">
+  <meta property="og:title" content="Spin & Speak 🎡 — Japanese speaking wheel">
+  <meta property="og:description" content="Spin a word. Speak for 1 minute. JLPT N5–N2 with English + Hindi meanings.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="glow" aria-hidden="true"></div>
+
+  <header class="top">
+    <h1 class="brand">Spin <span class="amp">&amp;</span> Speak</h1>
+    <p class="byline">
+      <span>practice with</span>
+      <a class="handle js-ig" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="fill"/></svg>
+        <span class="js-ig-text">@handle</span>
+      </a>
+      <a class="handle js-yt" href="#" target="_blank" rel="noopener" aria-label="YouTube">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 9.2v5.6l4.8-2.8z" class="fill"/></svg>
+        <span>YouTube</span>
+      </a>
+    </p>
+  </header>
+
+  <main class="wrap">
+    <div class="levels" role="radiogroup" aria-label="JLPT level">
+      <button type="button" role="radio" data-level="N5">N5</button>
+      <button type="button" role="radio" data-level="N4">N4</button>
+      <button type="button" role="radio" data-level="N3">N3</button>
+      <button type="button" role="radio" data-level="N2">N2</button>
+    </div>
+    <p class="level-hint" id="levelHint">Beginner · everyday words</p>
+
+    <section class="stage" id="stage">
+      <p class="status" id="status">今日のことば · word of the day</p>
+      <div class="word" id="word">
+        <p class="kana" id="kana" lang="ja"></p>
+        <h2 class="kanji" id="kanji" lang="ja">…</h2>
+      </div>
+      <p class="meaning" id="meaning">
+        <span id="en"></span><span class="sep" aria-hidden="true">·</span><span id="hi" lang="hi"></span>
+      </p>
+      <button type="button" class="listen" id="listen" aria-label="Listen to pronunciation">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" class="fill"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/></svg>
+        <span>Listen</span>
+      </button>
+      <p class="sr-only" id="announce" aria-live="polite"></p>
+    </section>
+
+    <div class="actions">
+      <button type="button" class="btn primary" id="spin">
+        <span class="btn-label">🎡 Spin</span>
+      </button>
+      <button type="button" class="btn ghost" id="timerToggle">Start timer</button>
+    </div>
+    <p class="kbd-hint">Press <kbd>Space</kbd> to spin</p>
+
+    <section class="card starters" id="startersCard">
+      <h3>💡 Start with</h3>
+      <ul id="starters"></ul>
+      <p class="tip">Tap a phrase to hear it. Fill the <b>〜</b> with your own words — mistakes are welcome.</p>
+    </section>
+
+
+    <section class="card timer" id="timerCard" aria-label="Speaking timer">
+      <div class="durations" role="radiogroup" aria-label="Timer length">
+        <button type="button" role="radio" data-sec="30">30s</button>
+        <button type="button" role="radio" data-sec="60">1 min</button>
+        <button type="button" role="radio" data-sec="180">3 min</button>
+        <button type="button" role="radio" data-sec="300">5 min</button>
+      </div>
+      <p class="digits" id="digits" aria-live="off">1:00</p>
+      <div class="bar" aria-hidden="true"><span id="barFill"></span></div>
+      <div class="timer-actions">
+        <button type="button" class="btn primary small" id="timerStart">Start</button>
+        <button type="button" class="btn ghost small" id="timerReset">Reset</button>
+      </div>
+      <p class="timer-msg" id="timerMsg" aria-live="polite">Speak until the beep. Don't stop to check grammar!</p>
+    </section>
+
+    <section class="card share">
+      <h3>📹 Record → post → tag</h3>
+      <p>Film yourself speaking, post it, and tag <a class="js-ig js-ig-text" href="#" target="_blank" rel="noopener">@handle</a> with <b class="js-tag">#SpinAndSpeak</b>. Best ones get reposted every week ✨</p>
+      <div class="share-actions">
+        <button type="button" class="btn ghost small" id="copyCaption">Copy caption</button>
+        <button type="button" class="btn ghost small" id="shareLink">Share this word</button>
+      </div>
+    </section>
+
+    <section class="card email" id="emailCard">
+      <h3>📅 Free JLPT study schedule</h3>
+      <p>A simple day-by-day plan for N5–N3. Free, straight to your inbox.</p>
+      <form id="emailForm" novalidate>
+        <label class="sr-only" for="email">Email address</label>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
+        <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button type="submit" class="btn primary small" id="emailBtn">Send it to me</button>
+      </form>
+      <p class="form-msg" id="formMsg" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Made by a fellow learner 🇮🇳→🇯🇵 · <a class="js-ig" href="#" target="_blank" rel="noopener">Instagram</a> · <a class="js-yt" href="#" target="_blank" rel="noopener">YouTube</a></p>
+    <p class="fine">Meanings checked by hand. Spotted a mistake? DM me. Audio uses your device's voice.</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
