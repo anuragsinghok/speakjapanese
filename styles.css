@@ -276,6 +276,7 @@ svg .fill { fill: currentColor; stroke: none; }
   font-size: .8rem;
   flex: none;
 }
+.starters .phrase { flex: 1; min-width: 0; }
 .starters .blank { color: var(--accent-2); padding: 0 1px; }
 .starters .tip { margin-top: 10px; font-size: .82rem; color: var(--ink-3); }
 .starters .tip b { color: var(--accent-2); font-weight: 600; }

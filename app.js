@@ -151,7 +151,7 @@
       b.type = "button";
       b.lang = "ja";
       b.setAttribute("aria-label", "Listen: " + s);
-      b.innerHTML = escapeHtml(s).replace(/〜/g, '<span class="blank">〜</span>');
+      b.innerHTML = '<span class="phrase">' + escapeHtml(s).replace(/〜/g, '<span class="blank">〜</span>') + "</span>";
       b.addEventListener("click", () => speak(s.replace(/〜/g, "、"), b));
       li.appendChild(b);
       ul.appendChild(li);
