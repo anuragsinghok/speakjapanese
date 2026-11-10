@@ -38,7 +38,7 @@
   const ytHandle = String(CFG.youtube || "").replace(/^@/, "").trim();
   const tag = String(CFG.hashtag || "SpinAndSpeak").replace(/^#/, "").trim();
   const igUrl = igHandle ? `https://www.instagram.com/${encodeURIComponent(igHandle)}/` : "https://www.instagram.com/";
-  const ytUrl = ytHandle ? `https://www.youtube.com/@${encodeURIComponent(ytHandle)}` : "https://www.youtube.com/";
+  const ytUrl = ytHandle ? `https://www.youtube.com/@${encodeURIComponent(ytHandle)}/videos` : "https://www.youtube.com/";
 
   function applyHandles() {
     $$("a.js-ig").forEach((a) => (a.href = igUrl));
