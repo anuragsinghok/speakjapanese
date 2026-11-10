@@ -427,7 +427,7 @@ kbd {
   .levels button { padding: 8px 15px; }
   .durations button { padding: 8px 10px; font-size: .85rem; }
   .actions { flex-wrap: nowrap; gap: 8px; }
-  .actions .btn { flex: 1 1 0; min-width: 0; padding: 14px 10px; font-size: .97rem; }
+  .actions .btn { flex: 1 1 0; min-width: 0; padding: 14px 8px; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #spin { min-width: 0; }
 }
 @media (max-width: 360px) {
