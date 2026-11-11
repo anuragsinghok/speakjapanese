@@ -3,6 +3,7 @@ window.SPIN_CONFIG = {
   // Handles without the @
   instagram: "anurag.pov",
   youtube: "anuragsinghok",
+  linkedin: "https://www.linkedin.com/in/anuragsinghok/",
 
   // Hashtag without the #
   hashtag: "JLPTSpin",

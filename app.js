@@ -43,6 +43,9 @@
   function applyHandles() {
     $$("a.js-ig").forEach((a) => (a.href = igUrl));
     $$("a.js-yt").forEach((a) => (a.href = ytUrl));
+    const li = String(CFG.linkedin || "").trim();
+    const liOk = /^https:\/\/(www\.)?linkedin\.com\//.test(li);
+    $$("a.js-li").forEach((a) => { if (liOk) a.href = li; else a.hidden = true; });
     $$(".js-ig-text").forEach((el) => (el.textContent = igHandle ? "@" + igHandle : "Instagram"));
     $$(".js-tag").forEach((el) => (el.textContent = "#" + tag));
   }
