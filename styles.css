@@ -316,7 +316,25 @@ svg .fill { fill: currentColor; stroke: none; }
 .btn[disabled] { opacity: .55; cursor: default; }
 #spin { min-width: 148px; }
 .is-spinning #spin { opacity: .8; }
-.kbd-hint { text-align: center; margin: 10px 0 0; font-size: .78rem; color: var(--ink-3); }
+.howto {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: .82rem;
+  color: var(--ink-2);
+}
+.howto li { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.howto span {
+  display: inline-grid; place-items: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(201, 138, 92, .18); color: var(--accent-2);
+  font-size: .7rem; font-weight: 600;
+}
+.kbd-hint { text-align: center; margin: 6px 0 0; font-size: .78rem; color: var(--ink-3); }
 kbd {
   font-family: var(--sans);
   font-size: .72rem;
