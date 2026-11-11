@@ -5,7 +5,7 @@ import json, html, os
 from datetime import date
 
 SITE = "https://jlptspin.com"
-V = "7"
+V = "8"
 words = json.load(open("words.json", encoding="utf-8"))
 LEVELS = ["N5", "N4", "N3", "N2"]
 INFO = {
@@ -105,7 +105,7 @@ for lv in LEVELS:
     open(f"{lv.lower()}/index.html", "w", encoding="utf-8").write(page(lv))
 
 today = date.today().isoformat()
-urls = [("/", "1.0"), ("/n5/", "0.8"), ("/n4/", "0.8"), ("/n3/", "0.8"), ("/n2/", "0.8"), ("/privacy.html", "0.2")]
+urls = [("/", "1.0"), ("/forum/", "0.6"), ("/n5/", "0.8"), ("/n4/", "0.8"), ("/n3/", "0.8"), ("/n2/", "0.8"), ("/privacy.html", "0.2")]
 sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
 for u, p in urls:
     sm.append(f"  <url><loc>{SITE}{u}</loc><lastmod>{today}</lastmod><priority>{p}</priority></url>")

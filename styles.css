@@ -20,6 +20,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
@@ -512,3 +513,50 @@ kbd {
   .vt .s { grid-column: 1 / -1; margin-top: 8px; padding-top: 8px !important; border-top: 1px solid var(--line) !important; }
   .vt td:last-child { grid-column: 2; grid-row: 1; align-self: start; }
 }
+
+/* Forum */
+.forum { max-width: 720px; }
+.f-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.f-back { color: var(--ink-2); font-size: .9rem; text-underline-offset: 3px; display: inline-block; margin-bottom: 8px; }
+.f-user { display: flex; align-items: center; gap: 10px; min-height: 36px; }
+.f-me { font-size: .9rem; color: var(--ink-2); }
+.f-note { font-size: .8rem; color: var(--ink-3); }
+.f-link { background: none; border: 0; padding: 4px 2px; color: var(--ink-3); font-size: .82rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.f-link:hover { color: var(--ink); }
+.f-link.danger { color: #f0a594; }
+.f-intro h1 { font-family: var(--serif); font-weight: 600; font-size: 1.5rem; margin: 0 0 6px; }
+.f-intro p { margin-bottom: 14px !important; }
+.f-form label { display: block; font-size: .8rem; font-weight: 600; color: var(--ink-2); margin: 12px 0 6px; }
+.f-form label:first-child { margin-top: 0; }
+.f-form input, .f-form textarea {
+  width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line-2);
+  background: rgba(0,0,0,.25); color: var(--ink); font: inherit; font-size: 16px; resize: vertical;
+}
+.f-form input:focus-visible, .f-form textarea:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.f-levels { margin: 0; }
+.f-levels button { padding: 6px 12px; min-height: 34px; font-size: .85rem; }
+.f-actions { display: flex; gap: 8px; margin-top: 12px; }
+.f-filter { display: flex; gap: 6px; flex-wrap: wrap; margin: 22px 0 10px; }
+.f-filter button { border: 1px solid var(--line-2); background: transparent; color: var(--ink-2); padding: 6px 13px; border-radius: 999px; font-size: .85rem; font-weight: 600; }
+.f-filter button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.f-list, .f-replies { list-style: none; margin: 0; padding: 0; }
+.f-item { margin-top: 10px; padding: 0; }
+.f-item-link { display: block; padding: 16px 18px; text-decoration: none; color: inherit; }
+.f-item-link:hover .f-title { color: var(--accent-2); }
+.f-tag { display: inline-block; font-size: .7rem; font-weight: 600; letter-spacing: .06em; color: var(--accent-2); border: 1px solid rgba(227,167,122,.4); border-radius: 999px; padding: 1px 8px; margin-bottom: 6px; }
+.f-title { display: block; font-weight: 600; font-size: 1.05rem; color: var(--ink); line-height: 1.35; }
+.f-excerpt { display: block; color: var(--ink-2); font-size: .9rem; margin-top: 4px; white-space: pre-line; overflow-wrap: anywhere; }
+.f-meta { display: block; font-size: .78rem; color: var(--ink-3); margin-top: 6px !important; }
+.f-ttitle { font-family: var(--serif); font-weight: 600; font-size: 1.45rem; line-height: 1.25; margin: 2px 0 0; overflow-wrap: anywhere; }
+.f-body { margin-top: 12px; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.f-acts { display: flex; gap: 12px; margin-top: 8px; }
+.f-reply { margin-top: 10px; }
+.f-reply .f-meta { margin-top: 0 !important; }
+.f-reply .f-body { margin-top: 6px; }
+.is-hidden { opacity: .5; border-style: dashed; }
+.f-empty, .f-signin-hint { text-align: center; color: var(--ink-3); margin: 22px 0; }
+.f-more { display: block; margin: 16px auto 0; }
+.f-rules { font-size: .78rem; color: var(--ink-3); margin-top: 30px; text-align: center; }
+.f-rules a { color: var(--ink-2); }
+.forum-cta { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.forum-cta .btn { text-decoration: none; display: inline-flex; }

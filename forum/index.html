@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Forum | JLPT Spin</title>
+  <meta name="description" content="Share study tips, ask questions and talk with other Japanese learners preparing for the JLPT, from N5 to N2.">
+  <meta name="theme-color" content="#14110f">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com https://www.googletagmanager.com; frame-src https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; form-action 'self'; base-uri 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="canonical" href="https://jlptspin.com/forum/">
+  <meta property="og:title" content="JLPT Spin forum">
+  <meta property="og:description" content="Share study tips and talk with other JLPT learners.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jlptspin.com/forum/">
+  <meta property="og:image" content="https://jlptspin.com/og.png">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=8">
+</head>
+<body>
+  <div class="glow" aria-hidden="true"></div>
+  <header class="top">
+    <a href="../" class="brand-link"><p class="brand">JLPT <span class="amp">Spin</span></p></a>
+    <p class="tagline">Forum</p>
+  </header>
+
+  <main class="wrap forum">
+    <div class="f-bar">
+      <a class="f-back" href="../">Back to spinning</a>
+      <div class="f-user" id="userBox">
+        <div id="gBtn"></div>
+        <span class="f-me" id="me" hidden></span>
+        <button type="button" class="f-link" id="signOut" hidden>Sign out</button>
+      </div>
+    </div>
+
+    <!-- List view -->
+    <section id="listView">
+      <div class="f-intro card">
+        <h1>Learner forum</h1>
+        <p>Share a study tip, ask a question, or post how your practice is going. Be kind, write in English, Japanese or Hindi, and no links please.</p>
+        <button type="button" class="btn primary small" id="newBtn">Start a topic</button>
+      </div>
+
+      <form class="card f-form" id="newForm" hidden>
+        <label for="nLevel">Level</label>
+        <div class="levels f-levels" id="nLevel" role="radiogroup" aria-label="Topic level">
+          <button type="button" role="radio" data-level="General" aria-checked="true">General</button>
+          <button type="button" role="radio" data-level="N5" aria-checked="false">N5</button>
+          <button type="button" role="radio" data-level="N4" aria-checked="false">N4</button>
+          <button type="button" role="radio" data-level="N3" aria-checked="false">N3</button>
+          <button type="button" role="radio" data-level="N2" aria-checked="false">N2</button>
+        </div>
+        <label for="nTitle">Title</label>
+        <input id="nTitle" maxlength="120" placeholder="e.g. How do you remember kanji?" required>
+        <label for="nBody">Your post</label>
+        <textarea id="nBody" rows="6" maxlength="3000" placeholder="Write your tip or question here" required></textarea>
+        <div class="f-actions">
+          <button type="submit" class="btn primary small" id="nSubmit">Post</button>
+          <button type="button" class="btn ghost small" id="nCancel">Cancel</button>
+        </div>
+        <p class="form-msg" id="nMsg" aria-live="polite"></p>
+      </form>
+
+      <div class="f-filter" role="tablist" aria-label="Filter by level">
+        <button type="button" data-f="" aria-selected="true">All</button>
+        <button type="button" data-f="General" aria-selected="false">General</button>
+        <button type="button" data-f="N5" aria-selected="false">N5</button>
+        <button type="button" data-f="N4" aria-selected="false">N4</button>
+        <button type="button" data-f="N3" aria-selected="false">N3</button>
+        <button type="button" data-f="N2" aria-selected="false">N2</button>
+      </div>
+      <ul class="f-list" id="threadList" aria-live="polite"></ul>
+      <p class="f-empty" id="listEmpty" hidden>No topics here yet. Be the first to start one.</p>
+      <button type="button" class="btn ghost small f-more" id="moreBtn" hidden>Load more</button>
+    </section>
+
+    <!-- Topic view -->
+    <section id="topicView" hidden>
+      <article class="card f-topic" id="topic"></article>
+      <ul class="f-replies" id="replies"></ul>
+      <form class="card f-form" id="replyForm">
+        <label for="rBody">Reply</label>
+        <textarea id="rBody" rows="4" maxlength="2000" placeholder="Write a reply" required></textarea>
+        <div class="f-actions">
+          <button type="submit" class="btn primary small" id="rSubmit">Reply</button>
+        </div>
+        <p class="form-msg" id="rMsg" aria-live="polite"></p>
+      </form>
+      <p class="f-signin-hint" id="replyHint" hidden>Sign in with Google (top right) to reply.</p>
+    </section>
+
+    <p class="f-rules">Forum rules: be kind, no ads or links, no personal info. Posts can be reported and removed. Only your first name from Google is shown. See the <a href="../privacy.html">privacy policy</a>.</p>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../config.js?v=8"></script>
+  <script src="../ga.js?v=8"></script>
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  <script src="forum.js?v=8"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+name = "jlptspin-forum"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+routes = [
+  { pattern = "api.jlptspin.com", custom_domain = true }
+]
+
+[vars]
+GOOGLE_CLIENT_ID = "222324073243-37eabco4mvvf3r5bguesc4sltmv7o36b.apps.googleusercontent.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "jlptspin-forum"
+database_id = "23da5af4-992f-4df7-807d-bfcfe78e74c2"
