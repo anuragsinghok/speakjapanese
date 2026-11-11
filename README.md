@@ -1,9 +1,11 @@
-# Spin & Speak 🎡
+# JLPT Spin 🎡
+
+*Spin a word · speak for 1 minute.*
 
 Japanese speaking practice: spin a word, get starter phrases, speak until the beep.
 JLPT N5–N2, with English and **Hindi** meanings.
 
-**Live:** https://anuragsinghok.github.io/speakjapanese/
+**Live:** https://jlptspin.com
 
 ## Edit your settings
 Everything personal lives in [`config.js`](config.js):
@@ -11,7 +13,7 @@ Everything personal lives in [`config.js`](config.js):
 | Setting | What it does |
 |---|---|
 | `instagram`, `youtube` | Your handles, without the `@`. Shown at the top, in the share box and in the footer |
-| `hashtag` | Defaults to `SpinAndSpeak` |
+| `hashtag` | Defaults to `JLPTSpin` |
 | `emailEndpoint` | Where email signups are sent. Leave it empty and the box says "signups open soon" |
 | `goatcounter` | Optional free analytics code. It counts spins, listens, timers, shares and signups |
 

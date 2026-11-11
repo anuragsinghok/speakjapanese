@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────
-//  Spin & Speak — the ONLY file you need to edit.
+//  JLPT Spin — the ONLY file you need to edit.
 // ─────────────────────────────────────────────────────────────
 window.SPIN_CONFIG = {
   // Your handles, without the "@".
@@ -7,7 +7,7 @@ window.SPIN_CONFIG = {
   youtube: "anuragsinghok",
 
   // Hashtag people should use (without "#").
-  hashtag: "SpinAndSpeak",
+  hashtag: "JLPTSpin",
 
   // Email signup endpoint. Paste a form "action" URL from one of:
   //   • Formspree  → https://formspree.io/f/xxxxxxx   (easiest)

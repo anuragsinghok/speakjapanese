@@ -75,6 +75,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   line-height: 1.1;
 }
 .brand .amp { color: var(--accent-2); font-style: italic; font-weight: 500; }
+.tagline { margin: 4px 0 0; font-size: .9rem; color: var(--ink-2); }
 .byline {
   margin: 8px 0 0;
   display: flex;

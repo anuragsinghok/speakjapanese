@@ -2,7 +2,7 @@
   "use strict";
 
   const CFG = Object.assign(
-    { instagram: "", youtube: "", hashtag: "SpinAndSpeak", emailEndpoint: "", goatcounter: "" },
+    { instagram: "", youtube: "", hashtag: "JLPTSpin", emailEndpoint: "", goatcounter: "" },
     window.SPIN_CONFIG || {}
   );
   const LEVELS = ["N5", "N4", "N3", "N2"];
@@ -36,7 +36,7 @@
   // ── Handles / links ──────────────────────
   const igHandle = String(CFG.instagram || "").replace(/^@/, "").trim();
   const ytHandle = String(CFG.youtube || "").replace(/^@/, "").trim();
-  const tag = String(CFG.hashtag || "SpinAndSpeak").replace(/^#/, "").trim();
+  const tag = String(CFG.hashtag || "JLPTSpin").replace(/^#/, "").trim();
   const igUrl = igHandle ? `https://www.instagram.com/${encodeURIComponent(igHandle)}/` : "https://www.instagram.com/";
   const ytUrl = ytHandle ? `https://www.youtube.com/@${encodeURIComponent(ytHandle)}/videos` : "https://www.youtube.com/";
 
@@ -502,6 +502,7 @@
       `${current.en}${current.hi ? " · " + current.hi : ""}`,
       "",
       `I spun the wheel and spoke for ${label(timer.total)} 🎡${igHandle ? " @" + igHandle : ""}`,
+      "Try it 👉 jlptspin.com",
       "",
       `#${tag} #LearnJapanese #JLPT${level} #日本語 #JapaneseInHindi`,
     ].join("\n");
@@ -617,7 +618,7 @@
       const url = shareUrl();
       if (navigator.share) {
         try {
-          await navigator.share({ title: "Spin & Speak 🎡", text: `Can you speak about「${current.kanji}」for ${label(timer.total)}?`, url });
+          await navigator.share({ title: "JLPT Spin 🎡", text: `Can you speak about「${current.kanji}」for ${label(timer.total)}?`, url });
           track("share");
           return;
         } catch (err) {
