@@ -10,6 +10,8 @@ const BAD_WORDS = [
   "fuck", "shit", "bitch", "cunt", "nigger", "faggot", "retard", "whore", "slut",
   "chutiya", "madarchod", "behenchod", "bhenchod", "randi", "gaand", "bhosdi", "lavda", "lauda",
 ];
+// Whole words only, so romaji like "shite", "shitsumon" or "Scunthorpe" isn't blocked.
+const BAD_RE = new RegExp("(^|[^a-z])(" + BAD_WORDS.join("|") + ")(s|es|ed|ing|ty|y)?(?![a-z])", "i");
 const LINK_RE = /(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|io|xyz|ru|cn|top|info|biz|link|site)\b)/i;
 
 const now = () => Math.floor(Date.now() / 1000);
@@ -118,8 +120,7 @@ function cleanText(s, max) {
 }
 
 function checkContent(text, user) {
-  const lower = text.toLowerCase();
-  if (BAD_WORDS.some((w) => lower.includes(w))) return "Please keep it friendly. That word isn't allowed here.";
+  if (BAD_RE.test(text)) return "Please keep it friendly. That word isn't allowed here.";
   if (!user.is_admin && LINK_RE.test(text)) return "Links aren't allowed in posts, to keep spam out.";
   return null;
 }
