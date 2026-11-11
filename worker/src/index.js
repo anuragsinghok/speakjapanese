@@ -142,8 +142,12 @@ async function bodyJson(req) {
 }
 
 function firstName(claims) {
-  const n = claims.given_name || (claims.name || "").split(" ")[0] || "Learner";
-  return cleanText(n, 30) || "Learner";
+  let n = cleanText(claims.given_name || (claims.name || "").split(" ")[0] || "", 30);
+  // "ANURAG" or "anurag" -> "Anurag" (only for plain Latin names)
+  if (/^[A-Za-z][A-Za-z'-]*$/.test(n) && (n === n.toUpperCase() || n === n.toLowerCase())) {
+    n = n.charAt(0).toUpperCase() + n.slice(1).toLowerCase();
+  }
+  return n || "Learner";
 }
 
 // handlers
