@@ -2,7 +2,7 @@
   "use strict";
 
   const CFG = Object.assign(
-    { instagram: "", youtube: "", hashtag: "JLPTSpin", emailEndpoint: "", goatcounter: "" },
+    { instagram: "", youtube: "", hashtag: "JLPTSpin", emailEndpoint: "", googleAnalytics: "" },
     window.SPIN_CONFIG || {}
   );
   const LEVELS = ["N5", "N4", "N3", "N2"];
@@ -58,20 +58,22 @@
   }
 
   // ── Analytics (optional) ─────────────────
-  function track(name) {
+  // Google Analytics 4 (only loads when a G- ID is set in config.js)
+  function track(name, params) {
     try {
-      if (window.goatcounter && window.goatcounter.count) {
-        window.goatcounter.count({ path: name, title: name, event: true });
-      }
+      if (typeof window.gtag === "function") window.gtag("event", name, Object.assign({ level }, params || {}));
     } catch { /* ignore */ }
   }
   function loadAnalytics() {
-    const code = String(CFG.goatcounter || "").trim();
-    if (!/^[a-z0-9-]+$/i.test(code)) return;
+    const id = String(CFG.googleAnalytics || "").trim();
+    if (!/^G-[A-Z0-9]{4,}$/i.test(id)) return;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag("js", new Date());
+    window.gtag("config", id, { anonymize_ip: true });
     const s = document.createElement("script");
     s.async = true;
-    s.src = "https://gc.zgo.at/count.js";
-    s.dataset.goatcounter = `https://${code}.goatcounter.com/count`;
+    s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(id);
     document.head.appendChild(s);
   }
 
@@ -218,7 +220,7 @@
     $("#spin").removeAttribute("aria-busy");
     setStatus(`Your word · ${level}`);
     spinning = false;
-    track("spin-" + level);
+    track("spin", { word: target.kanji });
   }
 
   function cancelSpin() {
@@ -328,7 +330,7 @@
     if (!jaVoice && synth.getVoices().length) {
       toast("No Japanese voice found — add one in your device's language settings");
     }
-    track("listen");
+    track("listen", { word: current ? current.kanji : "" });
   }
 
   // ── Timer ────────────────────────────────
@@ -422,7 +424,7 @@
     $("#timerMsg").textContent = current ? `Talk about「${current.kanji}」— keep going!` : "Keep going!";
     lockScreen(true);
     renderTimer();
-    track("timer-" + timer.total);
+    track("timer_start", { seconds: timer.total });
   }
 
   function pauseTimer() {
@@ -461,7 +463,7 @@
     beep();
     try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch { /* ignore */ }
     lockScreen(false);
-    track("timer-done");
+    track("timer_complete", { seconds: timer.total });
   }
 
   function setDuration(sec, force = false) {
@@ -574,7 +576,7 @@
         store.set("subscribed", true);
         form.reset();
         say("Done! Check your inbox (and spam folder) for the schedule 📅", "ok");
-        track("email-signup");
+        track("sign_up", { method: "email" });
       } catch {
         say("Hmm, that didn't go through. Please try again in a moment.", "err");
       } finally {
@@ -610,7 +612,7 @@
     $("#copyCaption").addEventListener("click", async () => {
       if (!current) return;
       toast((await copyText(caption())) ? "Caption copied — paste it in your post ✨" : "Couldn't copy — long-press to copy instead");
-      track("copy-caption");
+      track("copy_caption");
     });
 
     $("#shareLink").addEventListener("click", async () => {
@@ -619,14 +621,14 @@
       if (navigator.share) {
         try {
           await navigator.share({ title: "JLPT Spin 🎡", text: `Can you speak about「${current.kanji}」for ${label(timer.total)}?`, url });
-          track("share");
+          track("share", { method: "link" });
           return;
         } catch (err) {
           if (err && err.name === "AbortError") return;
         }
       }
       toast((await copyText(url)) ? "Link copied!" : url);
-      track("share");
+      track("share", { method: "link" });
     });
 
     document.addEventListener("keydown", (e) => {

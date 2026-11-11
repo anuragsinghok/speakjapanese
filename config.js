@@ -10,13 +10,13 @@ window.SPIN_CONFIG = {
   hashtag: "JLPTSpin",
 
   // Email signup endpoint. Paste a form "action" URL from one of:
-  //   • Formspree  → https://formspree.io/f/xxxxxxx   (easiest)
-  //   • MailerLite → embedded form action URL
+  //   • MailerLite → https://assets.mailerlite.com/jsonp/<account>/forms/<form>/subscribe
+  //   • Formspree  → https://formspree.io/f/xxxxxxx
   //   • Brevo      → embedded form action URL
   // Leave empty ("") and the box tells visitors signups open soon.
   emailEndpoint: "",
 
-  // Optional free analytics: your GoatCounter code, e.g. "spinspeak"
-  // for https://spinspeak.goatcounter.com. Leave "" to disable.
-  goatcounter: "",
+  // Google Analytics 4 Measurement ID, e.g. "G-ABC123XYZ".
+  // Leave "" to disable analytics.
+  googleAnalytics: "",
 };

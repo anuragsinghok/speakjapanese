@@ -457,3 +457,17 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ── Legal pages ──────────────────────── */
+.brand-link { text-decoration: none; color: inherit; }
+.legal { max-width: 680px; padding-bottom: 60px; }
+.legal h2 { font-family: var(--serif); font-weight: 600; font-size: 1.25rem; margin: 28px 0 8px; }
+.legal p, .legal li { color: var(--ink-2); font-size: .97rem; line-height: 1.65; }
+.legal ul { padding-left: 20px; margin: 8px 0; }
+.legal li { margin: 6px 0; }
+.legal b { color: var(--ink); font-weight: 600; }
+.legal a { color: var(--accent-2); text-underline-offset: 3px; }
+.legal .updated { color: var(--ink-3); font-size: .85rem; }
+.legal .back { margin-top: 32px; }
+.email .consent { margin-top: 8px !important; font-size: .76rem !important; color: var(--ink-3) !important; }
+.email .consent a, .foot a.plain { color: var(--ink-2); text-underline-offset: 3px; }
