@@ -473,3 +473,42 @@ kbd {
 .email .consent a, .foot a.plain { color: var(--ink-2); text-underline-offset: 3px; }
 .email-done { margin-top: 10px; }
 .email-done .btn { display: inline-flex; align-items: center; text-decoration: none; }
+
+/* Vocab list pages */
+.vocab { max-width: 860px; }
+.vocab h1 { font-family: var(--serif); font-weight: 600; font-size: clamp(1.5rem, 5vw, 2.1rem); line-height: 1.2; margin: 18px 0 10px; }
+.vocab .note { font-size: .85rem; color: var(--ink-3); }
+.lvnav { display: flex; gap: 6px; flex-wrap: wrap; }
+.lvnav a { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line-2); text-decoration: none; color: var(--ink-2); font-weight: 600; font-size: .9rem; }
+.lvnav a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.tablewrap { overflow-x: auto; margin: 18px 0; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+.vt { width: 100%; border-collapse: collapse; font-size: .92rem; min-width: 640px; }
+.vt th { text-align: left; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.vt td { padding: 12px 14px; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top; }
+.vt tr:last-child td { border-bottom: 0; }
+.vt .w b { display: block; font-size: 1.35rem; color: var(--ink); font-weight: 700; }
+.vt .w .r { font-size: .85rem; color: var(--ink-3); }
+.vt .hi { font-family: var(--hi); color: var(--ink); }
+.vt .s { font-size: .9rem; line-height: 1.6; }
+.vt .go { color: var(--accent-2); font-weight: 600; white-space: nowrap; }
+.vocab .cta { margin: 22px 0 6px; }
+.vocab .cta .btn { text-decoration: none; display: inline-flex; }
+
+/* Home page about + FAQ */
+.about h2 { font-family: var(--serif); font-weight: 600; font-size: 1.15rem; margin: 0 0 8px; }
+.about h3 { margin: 16px 0 4px; font-size: .95rem; }
+.about .lists { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.about .lists a { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line-2); text-decoration: none; color: var(--ink-2); font-weight: 500; font-size: .88rem; }
+.about .lists a:hover { color: var(--ink); }
+@media (max-width: 640px) {
+  .tablewrap { overflow: visible; border: 0; background: none; }
+  .vt { min-width: 0; }
+  .vt thead { display: none; }
+  .vt tr { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 14px 16px; margin-bottom: 10px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+  .vt td { padding: 0; border: 0; }
+  .vt .w { grid-column: 1; }
+  .vt td:nth-child(2), .vt .hi { grid-column: 1 / -1; font-size: 1rem; }
+  .vt td:nth-child(2) { color: var(--ink); margin-top: 6px; }
+  .vt .s { grid-column: 1 / -1; margin-top: 8px; padding-top: 8px !important; border-top: 1px solid var(--line) !important; }
+  .vt td:last-child { grid-column: 2; grid-row: 1; align-self: start; }
+}
