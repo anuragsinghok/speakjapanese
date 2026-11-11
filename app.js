@@ -421,7 +421,7 @@
     timer.running = true;
     clearInterval(timer.id);
     timer.id = setInterval(tick, 200);
-    $("#timerMsg").textContent = current ? `Talk about「${current.kanji}」, keep going` : "Keep going!";
+    $("#timerMsg").textContent = current ? `Talk about「${current.kanji}」, keep going` : "Keep going";
     lockScreen(true);
     renderTimer();
     track("timer_start", { seconds: timer.total });
@@ -442,7 +442,7 @@
     clearInterval(timer.id);
     timer.remaining = timer.total;
     $("#timerCard").classList.remove("done", "flash", "low");
-    $("#timerMsg").textContent = "Speak until the beep. Don't stop to check grammar!";
+    $("#timerMsg").textContent = "Keep talking until it beeps. Don't worry about grammar.";
     lockScreen(false);
     renderTimer();
   }
