@@ -535,11 +535,14 @@
 
   function setupEmail() {
     const form = $("#emailForm"), input = $("#email"), msg = $("#formMsg"), btn = $("#emailBtn");
+    const done = $("#emailDone");
     const endpoint = String(CFG.emailEndpoint || "").trim();
     const say = (text, cls) => { msg.textContent = text; msg.className = "form-msg " + (cls || ""); };
+    const showDownload = () => { if (done) done.hidden = false; };
 
     if (store.get("subscribed", false)) {
-      say("You're on the list ✓ Check your inbox for the schedule.", "ok");
+      say("You're on the list ✓", "ok");
+      showDownload();
     }
 
     input.addEventListener("input", () => input.removeAttribute("aria-invalid"));
@@ -563,22 +566,24 @@
       btn.textContent = "Sending…";
       try {
         const body = new FormData();
-        body.append("email", email);
-        body.append("fields[email]", email); // MailerLite field name
-        body.append("source", "spin-and-speak");
-        if (/formspree\.io|getform\.io|basin\.com/i.test(endpoint)) {
-          const res = await fetch(endpoint, { method: "POST", body, headers: { Accept: "application/json" } });
-          if (!res.ok) throw new Error("HTTP " + res.status);
+        body.append("fields[email]", email);
+        if (/mailerlite\.com/i.test(endpoint)) {
+          body.append("ml-submit", "1");
+          body.append("anticsrf", "true");
         } else {
-          // MailerLite / Brevo form actions don't send CORS headers: fire-and-forget
-          await fetch(endpoint, { method: "POST", body, mode: "no-cors" });
+          body.append("email", email);
         }
+        const res = await fetch(endpoint, { method: "POST", body, headers: { Accept: "application/json" } });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json().catch(() => ({}));
+        if (data && data.success === false) throw new Error("rejected");
         store.set("subscribed", true);
         form.reset();
-        say("Done! Check your inbox (and spam folder) for the schedule 📅", "ok");
+        say("You're in! 🎉 Download your schedule below.", "ok");
+        showDownload();
         track("sign_up", { method: "email" });
       } catch {
-        say("Hmm, that didn't go through. Please try again in a moment.", "err");
+        say("Hmm, that didn't go through. Please check your email and try again.", "err");
       } finally {
         btn.disabled = false;
         btn.textContent = old;

@@ -112,14 +112,17 @@
 
     <section class="card email" id="emailCard">
       <h3>📅 Free JLPT study schedule</h3>
-      <p>A 5-page week-by-week plan for N5, N4 and N3, with a 45-minute daily routine and exam-month checklist. Free, straight to your inbox.</p>
+      <p>A 5-page week-by-week plan for N5, N4 and N3, with a 45-minute daily routine and exam-month checklist. Enter your email to download it free.</p>
       <form id="emailForm" novalidate>
         <label class="sr-only" for="email">Email address</label>
         <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
         <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <button type="submit" class="btn primary small" id="emailBtn">Send it to me</button>
+        <button type="submit" class="btn primary small" id="emailBtn">Get the schedule</button>
       </form>
       <p class="form-msg" id="formMsg" aria-live="polite"></p>
+      <div class="email-done" id="emailDone" hidden>
+        <a class="btn primary small" href="jlpt-study-schedule.pdf" download="JLPT-Spin-Study-Schedule.pdf" target="_blank" rel="noopener">📥 Download your free schedule (PDF)</a>
+      </div>
       <p class="consent">No spam. Unsubscribe anytime. See our <a href="privacy.html">privacy policy</a>.</p>
     </section>
   </main>

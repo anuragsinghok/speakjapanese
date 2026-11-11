@@ -14,7 +14,7 @@ window.SPIN_CONFIG = {
   //   • Formspree  → https://formspree.io/f/xxxxxxx
   //   • Brevo      → embedded form action URL
   // Leave empty ("") and the box tells visitors signups open soon.
-  emailEndpoint: "",
+  emailEndpoint: "https://assets.mailerlite.com/jsonp/2786252/forms/203802887631931330/subscribe",
 
   // Google Analytics 4 Measurement ID, e.g. "G-ABC123XYZ".
   // Leave "" to disable analytics.

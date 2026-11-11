@@ -471,3 +471,5 @@ kbd {
 .legal .back { margin-top: 32px; }
 .email .consent { margin-top: 8px !important; font-size: .76rem !important; color: var(--ink-3) !important; }
 .email .consent a, .foot a.plain { color: var(--ink-2); text-underline-offset: 3px; }
+.email-done { margin-top: 10px; }
+.email-done .btn { display: inline-flex; align-items: center; text-decoration: none; }
