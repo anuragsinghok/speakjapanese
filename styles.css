@@ -560,3 +560,4 @@ kbd {
 .f-rules a { color: var(--ink-2); }
 .forum-cta { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .forum-cta .btn { text-decoration: none; display: inline-flex; }
+#gBtn iframe { color-scheme: light; }
