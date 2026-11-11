@@ -1,22 +1,15 @@
-// ─────────────────────────────────────────────────────────────
-//  JLPT Spin — the ONLY file you need to edit.
-// ─────────────────────────────────────────────────────────────
+// Site settings. This is the only file you normally need to change.
 window.SPIN_CONFIG = {
-  // Your handles, without the "@".
+  // Handles without the @
   instagram: "anurag.pov",
   youtube: "anuragsinghok",
 
-  // Hashtag people should use (without "#").
+  // Hashtag without the #
   hashtag: "JLPTSpin",
 
-  // Email signup endpoint. Paste a form "action" URL from one of:
-  //   • MailerLite → https://assets.mailerlite.com/jsonp/<account>/forms/<form>/subscribe
-  //   • Formspree  → https://formspree.io/f/xxxxxxx
-  //   • Brevo      → embedded form action URL
-  // Leave empty ("") and the box tells visitors signups open soon.
+  // MailerLite form endpoint (leave empty to turn signups off)
   emailEndpoint: "https://assets.mailerlite.com/jsonp/2786252/forms/203802887631931330/subscribe",
 
-  // Google Analytics 4 Measurement ID, e.g. "G-ABC123XYZ".
-  // Leave "" to disable analytics.
+  // Google Analytics ID (leave empty to turn analytics off)
   googleAnalytics: "G-8HH75S12Y8",
 };

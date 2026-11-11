@@ -7,10 +7,10 @@
   );
   const LEVELS = ["N5", "N4", "N3", "N2"];
   const LEVEL_HINTS = {
-    N5: "Beginner · everyday words",
-    N4: "Elementary · talk about your life",
-    N3: "Intermediate · opinions & feelings",
-    N2: "Upper-intermediate · society & ideas",
+    N5: "Beginner, everyday words",
+    N4: "Elementary, talking about your life",
+    N3: "Intermediate, opinions and feelings",
+    N2: "Upper intermediate, society and ideas",
   };
   const SPIN_MS = 1500;
   const $ = (s) => document.querySelector(s);
@@ -24,7 +24,7 @@
   const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  // ── State ────────────────────────────────
+  // State
   const byLevel = { N5: [], N4: [], N3: [], N2: [] };
   const bags = {};
   let level = "N5";
@@ -33,7 +33,7 @@
   let spinToken = 0;
   let loaded = false;
 
-  // ── Handles / links ──────────────────────
+  // Handles / links
   const igHandle = String(CFG.instagram || "").replace(/^@/, "").trim();
   const ytHandle = String(CFG.youtube || "").replace(/^@/, "").trim();
   const tag = String(CFG.hashtag || "JLPTSpin").replace(/^#/, "").trim();
@@ -47,7 +47,7 @@
     $$(".js-tag").forEach((el) => (el.textContent = "#" + tag));
   }
 
-  // ── Toast ────────────────────────────────
+  // Toast
   let toastTimer;
   function toast(msg) {
     const t = $("#toast");
@@ -57,7 +57,7 @@
     toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
   }
 
-  // ── Analytics (optional) ─────────────────
+  // Analytics (optional)
   // Google Analytics 4 (only loads when a G- ID is set in config.js)
   function track(name, params) {
     try {
@@ -77,7 +77,7 @@
     document.head.appendChild(s);
   }
 
-  // ── Words ────────────────────────────────
+  // Words
   function isValidWord(w) {
     return w && LEVELS.includes(w.level) && typeof w.kanji === "string" && w.kanji.trim() &&
       typeof w.en === "string" && Array.isArray(w.starters);
@@ -119,7 +119,7 @@
     return list[(seed * 2654435761 >>> 0) % list.length];
   }
 
-  // ── Rendering ────────────────────────────
+  // Rendering
   function sizeKanji(text) {
     const len = [...text].length;
     const vw = Math.min(20, 86 / Math.max(len, 1));
@@ -159,7 +159,7 @@
       ul.appendChild(li);
     });
     $("#startersCard").hidden = w.starters.length === 0;
-    if (timer.running) $("#timerMsg").textContent = `Talk about「${w.kanji}」— keep going!`;
+    if (timer.running) $("#timerMsg").textContent = `Talk about「${w.kanji}」, keep going`;
     $("#announce").textContent = `${w.kanji}${w.kana && w.kana !== w.kanji ? ", " + w.kana : ""}: ${w.en}${w.hi ? ", " + w.hi : ""}`;
     updateUrl();
   }
@@ -176,10 +176,10 @@
     } catch { /* file:// etc. */ }
   }
 
-  // ── Spin ─────────────────────────────────
+  // Spin
   async function spin() {
     if (spinning) return;
-    if (!loaded) return toast("Loading words…");
+    if (!loaded) return toast("Loading words...");
     const target = nextWord(level);
     if (!target) return toast("No words for this level yet");
     const pool = byLevel[level];
@@ -189,9 +189,9 @@
     const stage = document.body;
     const wordEl = $("#word");
     stage.classList.add("is-spinning");
-    $("#spin .btn-label").textContent = "Spinning…";
+    $("#spin .btn-label").textContent = "Spinning...";
     $("#spin").setAttribute("aria-busy", "true");
-    setStatus("Drawing…");
+    setStatus("Spinning...");
 
     if (!reduceMotion() && pool.length > 1) {
       let elapsed = 0, delay = 45, prev = null;
@@ -216,9 +216,9 @@
     void wordEl.offsetWidth;
     wordEl.classList.add("landed");
     document.body.classList.remove("is-spinning");
-    $("#spin .btn-label").textContent = "🎡 Spin again";
+    $("#spin .btn-label").textContent = "Spin again";
     $("#spin").removeAttribute("aria-busy");
-    setStatus(`Your word · ${level}`);
+    setStatus(`Your word (${level})`);
     spinning = false;
     track("spin", { word: target.kanji });
   }
@@ -231,7 +231,7 @@
     $("#spin").removeAttribute("aria-busy");
   }
 
-  // ── Level ────────────────────────────────
+  // Level
   function setLevel(lv, { pick = true, persist = true } = {}) {
     if (!LEVELS.includes(lv)) lv = "N5";
     level = lv;
@@ -252,8 +252,8 @@
         void $("#word").offsetWidth;
         $("#word").classList.add("landed");
       }
-      setStatus(`${lv} · tap spin for a new word`);
-      $("#spin .btn-label").textContent = "🎡 Spin";
+      setStatus(`${lv}: tap Spin for a new word`);
+      $("#spin .btn-label").textContent = "Spin";
     }
   }
 
@@ -273,7 +273,7 @@
     });
   }
 
-  // ── Speech ───────────────────────────────
+  // Speech
   const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
   let jaVoice = null;
   let speakingBtn = null;
@@ -328,12 +328,12 @@
     if (busy) speakTimer = setTimeout(() => { if (currentUtter === u) synth.speak(u); }, 40);
     else synth.speak(u);
     if (!jaVoice && synth.getVoices().length) {
-      toast("No Japanese voice found — add one in your device's language settings");
+      toast("No Japanese voice on this device. You can add one in your language settings.");
     }
     track("listen", { word: current ? current.kanji : "" });
   }
 
-  // ── Timer ────────────────────────────────
+  // Timer
   const timer = { total: 60, remaining: 60, endAt: 0, id: 0, running: false };
   let audioCtx = null;
   let wakeLock = null;
@@ -421,7 +421,7 @@
     timer.running = true;
     clearInterval(timer.id);
     timer.id = setInterval(tick, 200);
-    $("#timerMsg").textContent = current ? `Talk about「${current.kanji}」— keep going!` : "Keep going!";
+    $("#timerMsg").textContent = current ? `Talk about「${current.kanji}」, keep going` : "Keep going!";
     lockScreen(true);
     renderTimer();
     track("timer_start", { seconds: timer.total });
@@ -457,7 +457,7 @@
     card.classList.add("done");
     void card.offsetWidth;
     card.classList.add("flash");
-    $("#timerMsg").textContent = "おつかれさま！ Time's up — now post it 🎉";
+    $("#timerMsg").textContent = "おつかれさま！ Time's up, nice work.";
     $("#timerStart").textContent = "Again";
     $("#timerToggle").textContent = "Restart timer";
     beep();
@@ -488,7 +488,7 @@
     }
   });
 
-  // ── Share ────────────────────────────────
+  // Share
   function shareUrl() {
     const u = new URL(location.href);
     u.hash = "";
@@ -501,10 +501,10 @@
     const reading = current.kana && current.kana !== current.kanji ? `（${current.kana}）` : "";
     return [
       `今日のことば: ${current.kanji}${reading}`,
-      `${current.en}${current.hi ? " · " + current.hi : ""}`,
+      `${current.en}${current.hi ? " / " + current.hi : ""}`,
       "",
-      `I spun the wheel and spoke for ${label(timer.total)} 🎡${igHandle ? " @" + igHandle : ""}`,
-      "Try it 👉 jlptspin.com",
+      `Spun a word and talked for ${label(timer.total)}${igHandle ? " @" + igHandle : ""}`,
+      "Try it at jlptspin.com",
       "",
       `#${tag} #LearnJapanese #JLPT${level} #日本語 #JapaneseInHindi`,
     ].join("\n");
@@ -530,7 +530,7 @@
     return ok;
   }
 
-  // ── Email ────────────────────────────────
+  // Email
   const EMAIL_RE = /^[^\s@]+@([^\s@.]+\.)+[^\s@.]{2,}$/;
 
   function setupEmail() {
@@ -541,7 +541,7 @@
     const showDownload = () => { if (done) done.hidden = false; };
 
     if (store.get("subscribed", false)) {
-      say("You're on the list ✓", "ok");
+      say("You're already signed up.", "ok");
       showDownload();
     }
 
@@ -563,7 +563,7 @@
       }
       btn.disabled = true;
       const old = btn.textContent;
-      btn.textContent = "Sending…";
+      btn.textContent = "Sending...";
       try {
         const body = new FormData();
         body.append("fields[email]", email);
@@ -579,11 +579,11 @@
         if (data && data.success === false) throw new Error("rejected");
         store.set("subscribed", true);
         form.reset();
-        say("You're in! 🎉 Download your schedule below.", "ok");
+        say("Done! You can download it below.", "ok");
         showDownload();
         track("sign_up", { method: "email" });
       } catch {
-        say("Hmm, that didn't go through. Please check your email and try again.", "err");
+        say("That didn't work. Check your email and try again.", "err");
       } finally {
         btn.disabled = false;
         btn.textContent = old;
@@ -591,7 +591,7 @@
     });
   }
 
-  // ── Wire up ──────────────────────────────
+  // Wire up
   function bind() {
     $("#spin").addEventListener("click", spin);
     $("#listen").addEventListener("click", () => current && speak(current.kana || current.kanji, $("#listen")));
@@ -616,7 +616,7 @@
 
     $("#copyCaption").addEventListener("click", async () => {
       if (!current) return;
-      toast((await copyText(caption())) ? "Caption copied — paste it in your post ✨" : "Couldn't copy — long-press to copy instead");
+      toast((await copyText(caption())) ? "Caption copied" : "Couldn't copy. Try long-pressing instead.");
       track("copy_caption");
     });
 
@@ -625,7 +625,7 @@
       const url = shareUrl();
       if (navigator.share) {
         try {
-          await navigator.share({ title: "JLPT Spin 🎡", text: `Can you speak about「${current.kanji}」for ${label(timer.total)}?`, url });
+          await navigator.share({ title: "JLPT Spin", text: `Can you speak about「${current.kanji}」for ${label(timer.total)}?`, url });
           track("share", { method: "link" });
           return;
         } catch (err) {
@@ -666,7 +666,7 @@
       await loadWords();
     } catch {
       $("#kanji").textContent = "ごめん";
-      $("#en").textContent = "Couldn't load words — please refresh.";
+      $("#en").textContent = "Couldn't load the words. Please refresh.";
       $("#meaning .sep").style.display = "none";
       $("#startersCard").hidden = true;
       $("#spin").disabled = true;
@@ -682,11 +682,11 @@
     }
     if (shared) {
       renderWord(shared);
-      setStatus(`Shared word · ${level}`);
+      setStatus(`Shared word (${level})`);
     } else {
       const w = dailyWord(level);
       if (w) renderWord(w);
-      setStatus("今日のことば · word of the day");
+      setStatus("今日のことば");
     }
   }
 

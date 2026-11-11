@@ -1,47 +1,33 @@
-# JLPT Spin 🎡
+# JLPT Spin
 
-*Spin a word · speak for 1 minute.*
+Japanese speaking practice. You spin a word, look at the starter phrases and talk about it until the timer beeps. Words go from N5 to N2 and have English and Hindi meanings.
 
-Japanese speaking practice: spin a word, get starter phrases, speak until the beep.
-JLPT N5–N2, with English and **Hindi** meanings.
+Live at https://jlptspin.com
 
-**Live:** https://jlptspin.com
+## Settings
 
-## Edit your settings
-Everything personal lives in [`config.js`](config.js):
+Handles, hashtag, the MailerLite signup form and the Google Analytics ID are all in `config.js`.
 
-| Setting | What it does |
-|---|---|
-| `instagram`, `youtube` | Your handles, without the `@`. Shown at the top, in the share box and in the footer |
-| `hashtag` | Defaults to `JLPTSpin` |
-| `emailEndpoint` | Where email signups are sent. Leave it empty and the box says "signups open soon" |
-| `goatcounter` | Optional free analytics code. It counts spins, listens, timers, shares and signups |
+## Adding or fixing words
 
-### Turn on email signups (about 2 minutes)
-1. Make a free form at https://formspree.io and copy its URL (`https://formspree.io/f/xxxx`).
-2. Paste it into `emailEndpoint` and push.
-3. In Formspree, set an auto-reply that sends the schedule PDF or Notion link.
+Words are in `words.json`, one per line:
 
-MailerLite or Brevo embedded-form action URLs work too.
-
-## Add or fix words
-Edit [`words.json`](words.json). Each line is one word:
 ```json
 {"level":"N5","kanji":"家族","kana":"かぞく","en":"family","hi":"परिवार","starters":["わたしの家族は〜人です","家族と〜をします"]}
 ```
-- `kana` is the reading. For katakana words, use the same text as `kanji`.
-- Give 2–3 `starters`, with `〜` as the blank the learner fills in.
 
-## Handy for reels
-- `?level=N4&w=旅行` opens a specific word. The **Share this word** button builds this link for you.
-- **Copy caption** copies the word, meaning and hashtags ready to paste.
-- Press <kbd>Space</kbd> to spin on a laptop.
-- The first word on each level is a fixed **word of the day**.
+For katakana words put the same text in `kanji` and `kana`. Each word should have 2 or 3 starters, with 〜 where the learner fills in their own words.
 
-## Run locally
+## Links
+
+`?level=N4&w=旅行` opens a specific word. The "Share this word" button makes this link for you.
+
+## Running it locally
+
 ```bash
 python3 -m http.server 8765
 ```
-Then open http://localhost:8765. It has to be served over HTTP, because `fetch` won't load `words.json` from `file://`.
 
-Plain HTML/CSS/JS, with no build step. Hosted on GitHub Pages from `main`.
+Then open http://localhost:8765. It needs a local server because the browser won't load `words.json` from a file.
+
+Plain HTML, CSS and JavaScript. No build step. Hosted on GitHub Pages.

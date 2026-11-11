@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>JLPT Spin — Japanese Speaking Practice (N5–N2, English + Hindi)</title>
-  <meta name="description" content="Free JLPT speaking practice: spin a Japanese word, get starter phrases, and speak for 1 minute. N5–N2 words with English and Hindi meanings.">
+  <title>JLPT Spin | Japanese speaking practice for N5 to N2</title>
+  <meta name="description" content="Spin a Japanese word and talk about it for a minute. Free JLPT speaking practice for N5 to N2, with English and Hindi meanings.">
   <meta name="theme-color" content="#14110f">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; form-action 'self'; base-uri 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta property="og:title" content="JLPT Spin 🎡 — spin a word, speak for 1 minute">
-  <meta property="og:description" content="Spin a word. Speak for 1 minute. JLPT N5–N2 with English + Hindi meanings.">
+  <meta property="og:title" content="JLPT Spin: spin a word, talk for a minute">
+  <meta property="og:description" content="Free Japanese speaking practice for JLPT N5 to N2. Meanings in English and Hindi.">
   <meta property="og:type" content="website">
   <link rel="canonical" href="https://jlptspin.com/">
   <meta property="og:url" content="https://jlptspin.com/">
@@ -26,9 +26,9 @@
 
   <header class="top">
     <h1 class="brand">JLPT <span class="amp">Spin</span></h1>
-    <p class="tagline">Spin a word · speak for 1 minute</p>
+    <p class="tagline">Spin a word, then talk for a minute</p>
     <p class="byline">
-      <span>practice with</span>
+      <span>by</span>
       <a class="handle js-ig" href="#" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="fill"/></svg>
         <span class="js-ig-text">@handle</span>
@@ -47,13 +47,13 @@
       <button type="button" role="radio" data-level="N3">N3</button>
       <button type="button" role="radio" data-level="N2">N2</button>
     </div>
-    <p class="level-hint" id="levelHint">Beginner · everyday words</p>
+    <p class="level-hint" id="levelHint">Beginner, everyday words</p>
 
     <section class="stage" id="stage">
-      <p class="status" id="status">今日のことば · word of the day</p>
+      <p class="status" id="status">今日のことば</p>
       <div class="word" id="word">
         <p class="kana" id="kana" lang="ja"></p>
-        <h2 class="kanji" id="kanji" lang="ja">…</h2>
+        <h2 class="kanji" id="kanji" lang="ja"></h2>
       </div>
       <p class="meaning" id="meaning">
         <span id="en"></span><span class="sep" aria-hidden="true">·</span><span id="hi" lang="hi"></span>
@@ -67,21 +67,21 @@
 
     <div class="actions">
       <button type="button" class="btn primary" id="spin">
-        <span class="btn-label">🎡 Spin</span>
+        <span class="btn-label">Spin</span>
       </button>
       <button type="button" class="btn ghost" id="timerToggle">Start timer</button>
     </div>
     <ol class="howto" aria-label="How it works">
       <li><span>1</span>Spin a word</li>
-      <li><span>2</span>Use a starter</li>
-      <li><span>3</span>Talk till the beep</li>
+      <li><span>2</span>Pick a starter</li>
+      <li><span>3</span>Talk until it beeps</li>
     </ol>
     <p class="kbd-hint">Press <kbd>Space</kbd> to spin</p>
 
     <section class="card starters" id="startersCard">
-      <h3>💡 Start with</h3>
+      <h3>Try starting with</h3>
       <ul id="starters"></ul>
-      <p class="tip">Tap a phrase to hear it. Fill the <b>〜</b> with your own words — mistakes are welcome.</p>
+      <p class="tip">Tap a phrase to hear it. Fill in the <b>〜</b> with your own words. Mistakes are fine, that's how we learn.</p>
     </section>
 
 
@@ -98,12 +98,12 @@
         <button type="button" class="btn primary small" id="timerStart">Start</button>
         <button type="button" class="btn ghost small" id="timerReset">Reset</button>
       </div>
-      <p class="timer-msg" id="timerMsg" aria-live="polite">Speak until the beep. Don't stop to check grammar!</p>
+      <p class="timer-msg" id="timerMsg" aria-live="polite">Keep talking until it beeps. Don't worry about grammar.</p>
     </section>
 
     <section class="card share">
-      <h3>📹 Record → post → tag</h3>
-      <p>Film yourself speaking, post it, and tag <a class="js-ig js-ig-text" href="#" target="_blank" rel="noopener">@handle</a> with <b class="js-tag">#JLPTSpin</b>. Best ones get reposted every week ✨</p>
+      <h3>Record yourself and tag me</h3>
+      <p>If you film yourself, post it and tag <a class="js-ig js-ig-text" href="#" target="_blank" rel="noopener">@handle</a> with <b class="js-tag">#JLPTSpin</b>. I repost a few every week.</p>
       <div class="share-actions">
         <button type="button" class="btn ghost small" id="copyCaption">Copy caption</button>
         <button type="button" class="btn ghost small" id="shareLink">Share this word</button>
@@ -111,8 +111,8 @@
     </section>
 
     <section class="card email" id="emailCard">
-      <h3>📅 Free JLPT study schedule</h3>
-      <p>A 5-page week-by-week plan for N5, N4 and N3, with a 45-minute daily routine and exam-month checklist. Enter your email to download it free.</p>
+      <h3>Free JLPT study schedule</h3>
+      <p>A simple 5 page plan for N5, N4 and N3. It has a daily routine and a checklist for the last month before the exam. Put your email and you can download it straight away.</p>
       <form id="emailForm" novalidate>
         <label class="sr-only" for="email">Email address</label>
         <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
@@ -121,17 +121,17 @@
       </form>
       <p class="form-msg" id="formMsg" aria-live="polite"></p>
       <div class="email-done" id="emailDone" hidden>
-        <a class="btn primary small" href="jlpt-study-schedule.pdf" download="JLPT-Spin-Study-Schedule.pdf" target="_blank" rel="noopener">📥 Download your free schedule (PDF)</a>
+        <a class="btn primary small" href="jlpt-study-schedule.pdf" download="JLPT-Spin-Study-Schedule.pdf" target="_blank" rel="noopener">Download the PDF</a>
       </div>
-      <p class="consent">No spam. Unsubscribe anytime. See our <a href="privacy.html">privacy policy</a>.</p>
+      <p class="consent">No spam, and you can unsubscribe anytime. <a href="privacy.html">Privacy policy</a></p>
     </section>
   </main>
 
   <footer class="foot">
-    <p>Made by a fellow learner 🇮🇳→🇯🇵 · <a class="js-ig" href="#" target="_blank" rel="noopener">Instagram</a> · <a class="js-yt" href="#" target="_blank" rel="noopener">YouTube</a></p>
-    <p class="fine">Meanings checked by hand. Spotted a mistake? DM me. Audio uses your device's voice.</p>
+    <p>Made by Anurag, an Indian learner living in Japan. <a class="js-ig" href="#" target="_blank" rel="noopener">Instagram</a> | <a class="js-yt" href="#" target="_blank" rel="noopener">YouTube</a></p>
+    <p class="fine">I check the meanings myself, but if you find a mistake please DM me. The audio is your phone's built-in voice.</p>
     <p class="fine"><a class="plain" href="privacy.html">Privacy policy</a></p>
-    <p class="fine">JLPT Spin is an independent fan project, not affiliated with the JLPT, the Japan Foundation or JEES.</p>
+    <p class="fine">JLPT Spin is a personal project. It isn't connected to the official JLPT, the Japan Foundation or JEES.</p>
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
