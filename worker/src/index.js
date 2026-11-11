@@ -148,10 +148,11 @@ function firstName(claims) {
 
 // handlers
 
-async function authGoogle(req, env) {
-  const { credential } = await bodyJson(req);
+const FORUM_URL = "https://jlptspin.com/forum/";
+
+async function login(env, credential) {
   let claims;
-  try { claims = await verifyGoogle(env, credential); } catch { return fail(req, 401, "Google sign-in failed. Please try again."); }
+  try { claims = await verifyGoogle(env, credential); } catch { return { error: "Google sign-in failed. Please try again.", status: 401 }; }
   const isAdmin = env.ADMIN_EMAIL && claims.email_verified && String(claims.email).toLowerCase() === String(env.ADMIN_EMAIL).toLowerCase() ? 1 : 0;
   const name = firstName(claims);
   await env.DB.prepare(
@@ -159,8 +160,26 @@ async function authGoogle(req, env) {
      ON CONFLICT(sub) DO UPDATE SET name = excluded.name, is_admin = excluded.is_admin`
   ).bind(claims.sub, name, isAdmin, now()).run();
   const user = await env.DB.prepare("SELECT id, name, is_admin, banned FROM users WHERE sub = ?").bind(claims.sub).first();
-  if (user.banned) return fail(req, 403, "This account can't post on the forum.");
-  return json(req, { token: await makeSession(env, user.id), user: { id: user.id, name: user.name, isAdmin: !!user.is_admin } });
+  if (user.banned) return { error: "This account can't post on the forum.", status: 403 };
+  return { token: await makeSession(env, user.id), user: { id: user.id, name: user.name, isAdmin: !!user.is_admin } };
+}
+
+async function authGoogle(req, env) {
+  const { credential } = await bodyJson(req);
+  const r = await login(env, credential);
+  if (r.error) return fail(req, r.status, r.error);
+  return json(req, r);
+}
+
+// Google redirect mode: Google POSTs a form here, we send the browser back to the forum.
+async function authGoogleRedirect(req, env) {
+  let credential = "";
+  try { credential = (await req.formData()).get("credential") || ""; } catch { /* bad form */ }
+  const r = await login(env, credential);
+  const back = r.error
+    ? FORUM_URL + "#auth_error=" + encodeURIComponent(r.error)
+    : FORUM_URL + "#auth=" + encodeURIComponent(r.token);
+  return new Response(null, { status: 303, headers: { Location: back, "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" } });
 }
 
 async function listThreads(req, env, url, viewer) {
@@ -293,6 +312,7 @@ export default {
     try {
       if (path === "/" || path === "/health") return json(req, { ok: true });
       if (path === "/auth/google" && req.method === "POST") return await authGoogle(req, env);
+      if (path === "/auth/google/redirect" && req.method === "POST") return await authGoogleRedirect(req, env);
 
       const viewer = await readSession(env, req);
 

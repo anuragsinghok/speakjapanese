@@ -77,18 +77,6 @@
     $("#replyHint").hidden = !!me;
   }
 
-  async function onGoogle(resp) {
-    try {
-      const data = await api("/auth/google", { method: "POST", body: { credential: resp.credential } });
-      setUser(data.user, data.token);
-      toast(`Signed in as ${data.user.name}`);
-      track("login", { method: "Google" });
-      route();
-    } catch (e) {
-      toast(e.message);
-    }
-  }
-
   function initGoogle(tries = 0) {
     if (!CLIENT_ID) {
       $("#gBtn").append(el("span", { class: "f-note", text: "Sign-in is being set up" }));
@@ -98,7 +86,12 @@
       if (tries < 50) setTimeout(() => initGoogle(tries + 1), 150);
       return;
     }
-    google.accounts.id.initialize({ client_id: CLIENT_ID, callback: onGoogle, ux_mode: "popup", auto_select: false });
+    google.accounts.id.initialize({
+      client_id: CLIENT_ID,
+      ux_mode: "redirect",
+      login_uri: API + "/auth/google/redirect",
+      auto_select: false,
+    });
     google.accounts.id.renderButton($("#gBtn"), { theme: "filled_black", size: "medium", shape: "pill", text: "signin_with" });
   }
 
@@ -260,6 +253,7 @@
   }
 
   function route() {
+    rememberPlace();
     const id = Number(new URLSearchParams(location.search).get("t")) || 0;
     $("#listView").hidden = !!id;
     $("#topicView").hidden = !id;
@@ -275,11 +269,35 @@
   }
   window.addEventListener("popstate", route);
 
+  // Coming back from Google: #auth=<token> or #auth_error=<message>
+  function readAuthHash() {
+    const h = new URLSearchParams(location.hash.slice(1));
+    const t = h.get("auth"), err = h.get("auth_error");
+    if (!t && !err) return null;
+    const back = (() => { try { return sessionStorage.getItem("ss:forumReturn"); } catch { return null; } })();
+    const u = new URL(back && back.startsWith(location.origin + "/forum/") ? back : location.href);
+    u.hash = "";
+    history.replaceState(null, "", u);
+    if (err) { toast(err); return null; }
+    token = t;
+    store.set("forumToken", t);
+    return t;
+  }
+
+  function rememberPlace() {
+    try { sessionStorage.setItem("ss:forumReturn", location.href.split("#")[0]); } catch { /* ignore */ }
+  }
+
   // start
   async function init() {
     if (!API) { $("#listEmpty").hidden = false; $("#listEmpty").textContent = "The forum isn't set up yet."; return; }
+    const fresh = readAuthHash();
     if (token) {
-      try { const d = await api("/me"); setUser(d.user); } catch { setUser(null, null); }
+      try {
+        const d = await api("/me");
+        setUser(d.user);
+        if (fresh) { toast(`Signed in as ${d.user.name}`); track("login", { method: "Google" }); }
+      } catch { setUser(null, null); }
     } else {
       setUser(null);
     }
