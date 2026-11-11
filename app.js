@@ -195,6 +195,7 @@
     $("#spin .btn-label").textContent = "Spinning...";
     $("#spin").setAttribute("aria-busy", "true");
     setStatus("Spinning...");
+    if (soundOn) ensureAudio();
 
     if (!reduceMotion() && pool.length > 1) {
       let elapsed = 0, delay = 45, prev = null;
@@ -207,6 +208,7 @@
         void wordEl.offsetWidth; // restart tick animation
         wordEl.classList.add("ticking");
         renderHeadword(w);
+        clickSound(delay);
         await sleep(delay);
         if (token !== spinToken) return;
         elapsed += delay;
@@ -218,6 +220,7 @@
     renderWord(target);
     void wordEl.offsetWidth;
     wordEl.classList.add("landed");
+    ding();
     document.body.classList.remove("is-spinning");
     $("#spin .btn-label").textContent = "Spin again";
     $("#spin").removeAttribute("aria-busy");
@@ -387,6 +390,46 @@
         o.stop(t0 + off + 0.55);
       });
     } catch { /* ignore */ }
+  }
+
+  // Spin sounds: a soft click per word flip, a small chime when it lands
+  let soundOn = store.get("sound", true);
+
+  function tone(type, freq, start, len, vol) {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, start);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(vol, start + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + len);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(start);
+    o.stop(start + len + 0.02);
+  }
+
+  function clickSound(delay) {
+    if (!soundOn || !audioCtx || audioCtx.state !== "running") return;
+    try {
+      // clicks get a little lower and softer as the wheel slows down
+      const slow = Math.min(1, (delay - 45) / 185);
+      tone("triangle", 1900 - slow * 500 + Math.random() * 120, audioCtx.currentTime, 0.035, 0.14 - slow * 0.04);
+    } catch { /* ignore */ }
+  }
+
+  function ding() {
+    if (!soundOn || !audioCtx) return;
+    try {
+      const t0 = audioCtx.currentTime + 0.02;
+      tone("sine", 784, t0, 0.25, 0.18);
+      tone("sine", 1175, t0 + 0.09, 0.45, 0.16);
+    } catch { /* ignore */ }
+  }
+
+  function renderSoundToggle() {
+    const b = $("#soundToggle");
+    if (!b) return;
+    b.textContent = soundOn ? "Sound: on" : "Sound: off";
+    b.setAttribute("aria-pressed", String(soundOn));
   }
 
   let wakeWanted = false;
@@ -597,6 +640,13 @@
   // Wire up
   function bind() {
     $("#spin").addEventListener("click", spin);
+    renderSoundToggle();
+    $("#soundToggle")?.addEventListener("click", () => {
+      soundOn = !soundOn;
+      store.set("sound", soundOn);
+      renderSoundToggle();
+      if (soundOn) { ensureAudio(); ding(); }
+    });
     $("#listen").addEventListener("click", () => current && speak(current.kana || current.kanji, $("#listen")));
 
     $$(".levels button").forEach((b) => b.addEventListener("click", () => {

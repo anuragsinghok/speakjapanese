@@ -344,7 +344,8 @@ kbd {
   border: 1px solid var(--line-2);
   border-radius: 5px;
 }
-@media (hover: none) { .kbd-hint { display: none; } }
+@media (hover: none) { .kbd-only { display: none; } }
+.kbd-hint .f-link { font-size: .78rem; padding: 6px 4px; }
 
 /* Timer */
 .timer { text-align: center; scroll-margin-top: 16px; }
