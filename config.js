@@ -18,5 +18,5 @@ window.SPIN_CONFIG = {
 
   // Google Analytics 4 Measurement ID, e.g. "G-ABC123XYZ".
   // Leave "" to disable analytics.
-  googleAnalytics: "",
+  googleAnalytics: "G-8HH75S12Y8",
 };
