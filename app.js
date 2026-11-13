@@ -591,6 +591,7 @@
     box.hidden = false;
     $("#acctIn").hidden = !account;
     $("#acctOut").hidden = !!account;
+    if (account) { $("#acctPanel").hidden = true; $("#acctOpen").hidden = false; }
     if (account) $("#acctName").textContent = account.name || "you";
   }
 
