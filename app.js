@@ -344,7 +344,7 @@
   }
 
   // Timer
-  const timer = { total: 60, remaining: 60, endAt: 0, id: 0, running: false };
+  const timer = { total: 60, remaining: 60, endAt: 0, id: 0, running: false, lastSec: 0, resetId: 0 };
   let audioCtx = null;
   let wakeLock = null;
 
@@ -377,24 +377,31 @@
     } catch { /* no audio */ }
   }
 
-  function beep() {
-    if (!audioCtx) return;
+  // Last 5 seconds: short pips, higher on the final second
+  function countdownPip(sec) {
+    if (!soundOn || !audioCtx) return;
+    try {
+      if (audioCtx.state !== "running") audioCtx.resume();
+      tone("sine", sec === 1 ? 990 : 740, audioCtx.currentTime + 0.01, 0.12, 0.22);
+    } catch { /* ignore */ }
+  }
+
+  // Time's up: a ringing alarm like a real timer, three bursts of four beeps
+  function alarm() {
+    if (!soundOn || !audioCtx) return;
     try {
       if (audioCtx.state !== "running") audioCtx.resume();
       const t0 = audioCtx.currentTime + 0.05;
-      [0, 0.28, 0.56].forEach((off, i) => {
-        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-        o.type = "sine";
-        o.frequency.value = i === 2 ? 1175 : 880;
-        g.gain.setValueAtTime(0.0001, t0 + off);
-        g.gain.exponentialRampToValueAtTime(0.35, t0 + off + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, t0 + off + (i === 2 ? 0.5 : 0.2));
-        o.connect(g).connect(audioCtx.destination);
-        o.start(t0 + off);
-        o.stop(t0 + off + 0.55);
-      });
+      for (let burst = 0; burst < 3; burst++) {
+        for (let i = 0; i < 4; i++) {
+          const t = t0 + burst * 0.9 + i * 0.13;
+          tone("square", 1320, t, 0.08, 0.09);
+          tone("sine", 2640, t, 0.08, 0.05);
+        }
+      }
     } catch { /* ignore */ }
   }
+
 
   // Spin sounds: a soft click per word flip, a small chime when it lands
   let soundOn = store.get("sound", true);
@@ -457,6 +464,11 @@
   function tick() {
     timer.remaining = Math.max(0, (timer.endAt - Date.now()) / 1000);
     if (timer.remaining <= 0) return finishTimer();
+    const sec = Math.ceil(timer.remaining);
+    if (sec !== timer.lastSec) {
+      timer.lastSec = sec;
+      if (sec <= 5) countdownPip(sec);
+    }
     renderTimer();
   }
 
@@ -464,7 +476,9 @@
     if (timer.running) return;
     ensureAudio();
     stopSpeaking();
+    clearTimeout(timer.resetId);
     if (timer.remaining <= 0) timer.remaining = timer.total;
+    timer.lastSec = Math.ceil(timer.remaining);
     const card = $("#timerCard");
     card.classList.remove("done", "flash");
     timer.endAt = Date.now() + timer.remaining * 1000;
@@ -488,6 +502,7 @@
   }
 
   function resetTimer() {
+    clearTimeout(timer.resetId);
     timer.running = false;
     clearInterval(timer.id);
     timer.remaining = timer.total;
@@ -510,10 +525,19 @@
     $("#timerMsg").textContent = "おつかれさま！ Time's up, nice work.";
     $("#timerStart").textContent = "Again";
     $("#timerToggle").textContent = "Restart timer";
-    beep();
-    try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch { /* ignore */ }
+    alarm();
+    try { navigator.vibrate && navigator.vibrate([300, 120, 300, 120, 300]); } catch { /* ignore */ }
     lockScreen(false);
     track("timer_complete", { seconds: timer.total });
+    // Like a kitchen timer: after the alarm it goes back to the full time, ready for the next round.
+    clearTimeout(timer.resetId);
+    timer.resetId = setTimeout(() => {
+      if (timer.running) return;
+      timer.remaining = timer.total;
+      $("#timerCard").classList.remove("done", "flash");
+      renderTimer();
+      $("#timerMsg").textContent = "おつかれさま！ Spin a new word and go again.";
+    }, 3500);
   }
 
   function setDuration(sec, force = false) {
