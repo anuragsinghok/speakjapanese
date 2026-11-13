@@ -565,3 +565,26 @@ kbd {
 .forum-cta { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .forum-cta .btn { text-decoration: none; display: inline-flex; }
 #gBtn iframe { color-scheme: light; }
+
+/* Today's study */
+.daily .d-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.daily h3 { display: flex; align-items: center; gap: 8px; }
+.d-level { font-family: var(--sans, inherit); font-size: .72rem; font-weight: 600; letter-spacing: .04em; padding: 2px 8px; border-radius: 99px; background: rgba(201, 138, 92, .18); color: var(--accent-2); }
+.d-date { margin: 0; font-size: .8rem; color: var(--ink-3); }
+.d-block { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(244, 236, 223, .08); }
+.d-label { margin: 0 0 8px; font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.d-kanji { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.d-big { font-family: var(--jp); font-size: 3.2rem; line-height: 1; min-width: 1.1em; text-align: center; }
+.d-km { margin: 0; font-weight: 500; }
+.d-read { margin: 4px 0 0; font-family: var(--jp); font-size: .85rem; color: var(--ink-3); }
+.d-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.d-list button, .d-example button { width: 100%; text-align: left; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(244, 236, 223, .1); background: rgba(244, 236, 223, .04); color: var(--ink); font: inherit; cursor: pointer; }
+.d-list button:hover, .d-example button:hover { border-color: rgba(244, 236, 223, .28); }
+.d-list b { font-family: var(--jp); font-weight: 500; font-size: 1.05rem; }
+.d-list .r { font-family: var(--jp); font-size: .82rem; color: var(--ink-3); }
+.d-list .m { font-size: .85rem; color: var(--ink-2, var(--ink-3)); }
+.d-pattern { margin: 0; font-family: var(--jp); font-size: 1.25rem; font-weight: 500; }
+.d-pm { margin: 2px 0 10px; font-size: .88rem; color: var(--ink-3); }
+.d-example .phrase { font-family: var(--jp); }
+.d-en { margin: 6px 2px 0; font-size: .85rem; color: var(--ink-3); }
+.daily .tip { margin-top: 16px; }

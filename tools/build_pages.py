@@ -1,18 +1,19 @@
-"""Builds the vocabulary list pages (n5/ ... n2/) and sitemap.xml from words.json.
+"""Builds the vocabulary list pages (n5/ ... n1/) and sitemap.xml from words.json.
 Run from the repo root:  python3 tools/build_pages.py
 """
 import json, html, os
 from datetime import date
 
 SITE = "https://jlptspin.com"
-V = "14"
+V = "15"
 words = json.load(open("words.json", encoding="utf-8"))
-LEVELS = ["N5", "N4", "N3", "N2"]
+LEVELS = ["N5", "N4", "N3", "N2", "N1"]
 INFO = {
     "N5": ("beginner", "Everyday words you'll use from your first week: family, food, weather, school, hobbies."),
     "N4": ("elementary", "Words for talking about your own life: work, travel, plans, habits and experiences."),
     "N3": ("intermediate", "Words for opinions and feelings: goals, stress, relationships, society and work life."),
     "N2": ("upper intermediate", "Words for discussing bigger topics: career, technology, education and social issues."),
+    "N1": ("advanced", "Words for debate and abstract ideas: ethics, society, inner conflict and the way people think."),
 }
 esc = html.escape
 
@@ -30,7 +31,7 @@ def page(lv):
           <td>{esc(w['en'])}</td>
           <td lang="hi" class="hi">{esc(w.get('hi',''))}</td>
           <td class="jp s">{starters}</td>
-          <td><a class="go" href="{practice}">Practise</a></td>
+          <td><a class="go" href="{practice}">Practice</a></td>
         </tr>""")
     others = " ".join(
         f'<a href="../{l.lower()}/"{" aria-current=\"page\"" if l == lv else ""}>{l}</a>' for l in LEVELS)
@@ -81,7 +82,7 @@ def page(lv):
   <main class="wrap legal vocab">
     <nav class="lvnav" aria-label="Levels">{others}</nav>
     <h1>JLPT {lv} vocabulary with Hindi and English meanings</h1>
-    <p>{esc(blurb)} Each word has its reading, the meaning in English and Hindi, and two sentence starters so you can actually say something with it. Tap <b>Practise</b> to open the word on JLPT Spin and talk about it for a minute.</p>
+    <p>{esc(blurb)} Each word has its reading, the meaning in English and Hindi, and two sentence starters so you can actually say something with it. Tap <b>Practice</b> to open the word on JLPT Spin and talk about it for a minute.</p>
     <p class="note">This is a {lvl_name} list of {len(items)} words I picked because they're easy to talk about. It isn't the full official {lv} list.</p>
     <div class="tablewrap">
       <table class="vt">
@@ -91,7 +92,7 @@ def page(lv):
         </tbody>
       </table>
     </div>
-    <p class="cta"><a class="btn primary small" href="../?level={lv}">Practise {lv} words now</a></p>
+    <p class="cta"><a class="btn primary small" href="../?level={lv}">Practice {lv} words now</a></p>
     <p class="back"><a href="../">Back to JLPT Spin</a> | <a href="../privacy.html">Privacy policy</a></p>
   </main>
   <script src="../config.js?v={V}"></script>
@@ -105,7 +106,7 @@ for lv in LEVELS:
     open(f"{lv.lower()}/index.html", "w", encoding="utf-8").write(page(lv))
 
 today = date.today().isoformat()
-urls = [("/", "1.0"), ("/forum/", "0.6"), ("/n5/", "0.8"), ("/n4/", "0.8"), ("/n3/", "0.8"), ("/n2/", "0.8"), ("/privacy.html", "0.2")]
+urls = [("/", "1.0"), ("/forum/", "0.6"), ("/n5/", "0.8"), ("/n4/", "0.8"), ("/n3/", "0.8"), ("/n2/", "0.8"), ("/n1/", "0.8"), ("/privacy.html", "0.2")]
 sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
 for u, p in urls:
     sm.append(f"  <url><loc>{SITE}{u}</loc><lastmod>{today}</lastmod><priority>{p}</priority></url>")

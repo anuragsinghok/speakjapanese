@@ -5,12 +5,13 @@
     { instagram: "", youtube: "", hashtag: "JLPTSpin", emailEndpoint: "", googleAnalytics: "" },
     window.SPIN_CONFIG || {}
   );
-  const LEVELS = ["N5", "N4", "N3", "N2"];
+  const LEVELS = ["N5", "N4", "N3", "N2", "N1"];
   const LEVEL_HINTS = {
     N5: "Beginner, everyday words",
     N4: "Elementary, talking about your life",
     N3: "Intermediate, opinions and feelings",
     N2: "Upper intermediate, society and ideas",
+    N1: "Advanced, debate and big ideas",
   };
   const SPIN_MS = 1500;
   const $ = (s) => document.querySelector(s);
@@ -25,7 +26,7 @@
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   // State
-  const byLevel = { N5: [], N4: [], N3: [], N2: [] };
+  const byLevel = { N5: [], N4: [], N3: [], N2: [], N1: [] };
   const bags = {};
   let level = "N5";
   let current = null;
@@ -114,12 +115,89 @@
     return bags[lv].pop();
   }
 
+  function daySeed() {
+    const d = new Date();
+    return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+  }
+
   function dailyWord(lv) {
     const list = byLevel[lv];
     if (!list.length) return null;
-    const d = new Date();
-    const seed = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
-    return list[(seed * 2654435761 >>> 0) % list.length];
+    return list[(daySeed() * 2654435761 >>> 0) % list.length];
+  }
+
+  // Today's study: one kanji, three words and one grammar point per level.
+  // Everyone gets the same set on the same day, and it changes at midnight.
+  let daily = null;
+
+  async function loadDaily() {
+    try {
+      const res = await fetch("daily.json?v=15", { cache: "no-cache" });
+      if (res.ok) daily = await res.json();
+    } catch { /* card stays hidden */ }
+    renderDaily();
+  }
+
+  function speakBtn(text, label, html) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.lang = "ja";
+    b.setAttribute("aria-label", "Listen: " + label);
+    b.innerHTML = html;
+    b.addEventListener("click", () => speak(text, b));
+    return b;
+  }
+
+  function renderDaily() {
+    const card = $("#dailyCard");
+    const set = daily && daily[level];
+    if (!card || !set || !set.kanji.length || !set.grammar.length) { if (card) card.hidden = true; return; }
+    const day = daySeed();
+    const k = set.kanji[day % set.kanji.length];
+    const g = set.grammar[(day * 5 + 3) % set.grammar.length];
+    const pool = byLevel[level];
+    const words = [];
+    if (pool.length) {
+      const start = (day * 7) % pool.length;
+      for (let i = 0; i < Math.min(3, pool.length); i++) words.push(pool[(start + i * 11) % pool.length]);
+    }
+
+    $("#dLevel").textContent = level;
+    try {
+      $("#dDate").textContent = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+    } catch { $("#dDate").textContent = ""; }
+
+    $("#dKanji").textContent = k.k;
+    $("#dKanjiMeaning").textContent = k.m;
+    const rd = [];
+    if (k.on) rd.push("On: " + k.on);
+    if (k.kun) rd.push("Kun: " + k.kun);
+    $("#dKanjiRead").textContent = rd.join("  ·  ");
+    const kx = $("#dKanjiWords");
+    kx.innerHTML = "";
+    k.ex.forEach((x) => {
+      const li = document.createElement("li");
+      li.appendChild(speakBtn(x.w, x.w, `<b>${escapeHtml(x.w)}</b><span class="r">${escapeHtml(x.r)}</span><span class="m" lang="en">${escapeHtml(x.m)}</span>`));
+      kx.appendChild(li);
+    });
+
+    const wl = $("#dWords");
+    wl.innerHTML = "";
+    [...new Set(words)].forEach((w) => {
+      const li = document.createElement("li");
+      const reading = w.kana && w.kana !== w.kanji ? `<span class="r">${escapeHtml(w.kana)}</span>` : "";
+      const hi = w.hi ? ` · <span lang="hi">${escapeHtml(w.hi)}</span>` : "";
+      li.appendChild(speakBtn(w.kana || w.kanji, w.kanji, `<b>${escapeHtml(w.kanji)}</b>${reading}<span class="m" lang="en">${escapeHtml(w.en)}${hi}</span>`));
+      wl.appendChild(li);
+    });
+
+    $("#dPattern").textContent = g.p;
+    $("#dPatternMeaning").textContent = g.m;
+    const ex = $("#dExample");
+    ex.innerHTML = "";
+    ex.appendChild(speakBtn(g.ex, g.ex, `<span class="phrase">${escapeHtml(g.ex)}</span>`));
+    $("#dExampleEn").textContent = g.en;
+    card.hidden = false;
   }
 
   // Rendering
@@ -248,6 +326,7 @@
       b.tabIndex = on ? 0 : -1;
     });
     $("#levelHint").textContent = LEVEL_HINTS[lv];
+    renderDaily();
     if (pick) {
       if (spinning) cancelSpin();
       stopSpeaking();
@@ -717,6 +796,7 @@
 
     try {
       await loadWords();
+      loadDaily();
     } catch {
       $("#kanji").textContent = "ごめん";
       $("#en").textContent = "Couldn't load the words. Please refresh.";

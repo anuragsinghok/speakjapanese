@@ -1,6 +1,6 @@
 // JLPT Spin forum API (Cloudflare Worker + D1)
 
-const LEVELS = ["N5", "N4", "N3", "N2", "General"];
+const LEVELS = ["N5", "N4", "N3", "N2", "N1", "General"];
 const ALLOWED_ORIGINS = ["https://jlptspin.com", "https://www.jlptspin.com", "http://localhost:8765"];
 const SESSION_DAYS = 30;
 const HIDE_AFTER_REPORTS = 3;

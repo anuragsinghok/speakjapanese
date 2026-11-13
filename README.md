@@ -1,6 +1,6 @@
 # JLPT Spin
 
-Japanese speaking practice. You spin a word, look at the starter phrases and talk about it until the timer beeps. Words go from N5 to N2 and have English and Hindi meanings.
+Japanese speaking practice. You spin a word, look at the starter phrases and talk about it until the timer beeps. Words go from N5 to N1 and have English and Hindi meanings.
 
 Live at https://jlptspin.com
 

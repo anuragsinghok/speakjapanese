@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Forum | JLPT Spin</title>
-  <meta name="description" content="Share study tips, ask questions and talk with other Japanese learners preparing for the JLPT, from N5 to N2.">
+  <meta name="description" content="Share study tips, ask questions and talk with other Japanese learners preparing for the JLPT, from N5 to N1.">
   <meta name="theme-color" content="#14110f">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com https://www.googletagmanager.com; frame-src https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; form-action 'self'; base-uri 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css?v=14">
+  <link rel="stylesheet" href="../styles.css?v=15">
 </head>
 <body>
   <div class="glow" aria-hidden="true"></div>
@@ -53,6 +53,7 @@
           <button type="button" role="radio" data-level="N4" aria-checked="false">N4</button>
           <button type="button" role="radio" data-level="N3" aria-checked="false">N3</button>
           <button type="button" role="radio" data-level="N2" aria-checked="false">N2</button>
+          <button type="button" role="radio" data-level="N1" aria-checked="false">N1</button>
         </div>
         <label for="nTitle">Title</label>
         <input id="nTitle" maxlength="120" placeholder="e.g. How do you remember kanji?" required>
@@ -72,6 +73,7 @@
         <button type="button" data-f="N4" aria-selected="false">N4</button>
         <button type="button" data-f="N3" aria-selected="false">N3</button>
         <button type="button" data-f="N2" aria-selected="false">N2</button>
+        <button type="button" data-f="N1" aria-selected="false">N1</button>
       </div>
       <ul class="f-list" id="threadList" aria-live="polite"></ul>
       <p class="f-empty" id="listEmpty" hidden>No topics here yet. Be the first to start one.</p>
@@ -98,9 +100,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="../config.js?v=14"></script>
-  <script src="../ga.js?v=14"></script>
+  <script src="../config.js?v=15"></script>
+  <script src="../ga.js?v=15"></script>
   <script src="https://accounts.google.com/gsi/client" async></script>
-  <script src="forum.js?v=14"></script>
+  <script src="forum.js?v=15"></script>
 </body>
 </html>
