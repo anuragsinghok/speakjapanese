@@ -576,3 +576,11 @@ kbd {
 .streak.today { color: var(--ink-2); }
 .streak .best { color: var(--ink-3); font-size: .78rem; margin-left: 4px; white-space: nowrap; }
 .timer .streak { margin: 14px auto 0 !important; }
+
+/* Optional sign-in for the streak */
+.streak-acct { margin-top: 8px; font-size: .8rem; color: var(--ink-3); }
+.streak-acct p { margin: 4px 0 0 !important; font-size: .8rem !important; color: var(--ink-3) !important; }
+.streak-acct .f-link { font-size: .8rem; }
+.acct-panel { margin: 8px auto 0; max-width: 26em; }
+#gBtnMain { display: flex; justify-content: center; margin-top: 10px; min-height: 44px; }
+#gBtnMain iframe { color-scheme: light; }

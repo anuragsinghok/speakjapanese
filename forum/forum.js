@@ -275,6 +275,15 @@
     const t = h.get("auth"), err = h.get("auth_error");
     if (!t && !err) return null;
     const back = (() => { try { return sessionStorage.getItem("ss:forumReturn"); } catch { return null; } })();
+    // Signed in from the main page (to save a streak): store the session and go back there.
+    if (back && back.startsWith(location.origin + "/") && !back.startsWith(location.origin + "/forum/")) {
+      try { sessionStorage.removeItem("ss:forumReturn"); } catch { /* ignore */ }
+      if (t) store.set("forumToken", t);
+      const dest = new URL(back);
+      if (err) dest.searchParams.set("signin", "failed");
+      location.replace(dest.href);
+      return "leaving";
+    }
     const u = new URL(back && back.startsWith(location.origin + "/forum/") ? back : location.href);
     u.hash = "";
     history.replaceState(null, "", u);
@@ -292,6 +301,7 @@
   async function init() {
     if (!API) { $("#listEmpty").hidden = false; $("#listEmpty").textContent = "The forum isn't set up yet."; return; }
     const fresh = readAuthHash();
+    if (fresh === "leaving") return;
     if (token) {
       try {
         const d = await api("/me");

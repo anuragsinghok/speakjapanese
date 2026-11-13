@@ -544,7 +544,95 @@
     s.best = Math.max(s.best, s.count);
     store.set("streak", s);
     renderStreak();
+    syncStreak();
     return { s, grew: s.count !== before };
+  }
+
+  // Optional sign-in: same Google account and session as the forum.
+  const API = (CFG.forumApi || "").replace(/\/+$/, "");
+  let account = null; // { name } once the server confirms the session
+
+  // The forum saves the session token as plain text (not JSON), so read it directly.
+  function authToken() {
+    try {
+      const t = localStorage.getItem("ss:forumToken");
+      return t && /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(t) ? t : null;
+    } catch { return null; }
+  }
+
+  async function syncStreak() {
+    const token = authToken();
+    if (!API || !token) { account = null; renderAccount(); return; }
+    try {
+      const res = await fetch(API + "/streak", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify({ streak: store.get("streak", null) }),
+      });
+      if (res.status === 401) {
+        try { localStorage.removeItem("ss:forumToken"); } catch { /* ignore */ }
+        account = null;
+      } else if (res.ok) {
+        const d = await res.json();
+        if (d.streak) store.set("streak", d.streak);
+        account = d.user || { name: "" };
+        renderStreak();
+        let justSignedIn = false;
+        try { justSignedIn = sessionStorage.getItem("ss:signingIn") === "1"; sessionStorage.removeItem("ss:signingIn"); } catch { /* ignore */ }
+        if (justSignedIn) { toast(`Signed in as ${account.name}. Your streak is saved.`); track("login", { method: "Google", from: "streak" }); }
+      }
+    } catch { /* offline: the local streak still works */ }
+    renderAccount();
+  }
+
+  function renderAccount() {
+    const box = $("#streakAccount");
+    if (!box || !API || !CFG.googleClientId) return;
+    box.hidden = false;
+    $("#acctIn").hidden = !account;
+    $("#acctOut").hidden = !!account;
+    if (account) $("#acctName").textContent = account.name || "you";
+  }
+
+  let gsiLoading = false;
+  function showGoogleButton() {
+    $("#acctPanel").hidden = false;
+    $("#acctOpen").hidden = true;
+    try {
+      const back = new URL(location.href);
+      back.searchParams.delete("signin");
+      back.hash = "timerCard";
+      sessionStorage.setItem("ss:forumReturn", back.href);
+      sessionStorage.setItem("ss:signingIn", "1");
+    } catch { /* ignore */ }
+    const render = () => {
+      if (!window.google || !google.accounts || !google.accounts.id) return false;
+      google.accounts.id.initialize({
+        client_id: CFG.googleClientId,
+        ux_mode: "redirect",
+        login_uri: API + "/auth/google/redirect",
+        auto_select: false,
+      });
+      google.accounts.id.renderButton($("#gBtnMain"), { theme: "filled_black", size: "large", shape: "pill", text: "signin_with" });
+      return true;
+    };
+    if (render()) return;
+    if (!gsiLoading) {
+      gsiLoading = true;
+      const sc = document.createElement("script");
+      sc.src = "https://accounts.google.com/gsi/client";
+      sc.async = true;
+      sc.onload = () => { if (!render()) $("#acctMsg").textContent = "Google sign-in didn't load. Please try again."; };
+      sc.onerror = () => { $("#acctMsg").textContent = "Google sign-in didn't load. Check your connection."; };
+      document.head.appendChild(sc);
+    }
+  }
+
+  function signOut() {
+    try { localStorage.removeItem("ss:forumToken"); } catch { /* ignore */ }
+    account = null;
+    renderAccount();
+    toast("Signed out. Your streak stays on this device.");
   }
 
   function renderStreak() {
@@ -802,6 +890,14 @@
     setDuration(Number(store.get("duration", 60)), true);
     loadAnalytics();
     renderStreak();
+    renderAccount();
+    syncStreak();
+    $("#acctOpen")?.addEventListener("click", showGoogleButton);
+    if (new URLSearchParams(location.search).get("signin") === "failed") {
+      toast("Google sign-in didn't work. Please try again.");
+      try { sessionStorage.removeItem("ss:signingIn"); const u = new URL(location.href); u.searchParams.delete("signin"); history.replaceState(null, "", u); } catch { /* ignore */ }
+    }
+    $("#acctSignOut")?.addEventListener("click", signOut);
 
     const params = new URLSearchParams(location.search);
     const urlLevel = (params.get("level") || "").toUpperCase();

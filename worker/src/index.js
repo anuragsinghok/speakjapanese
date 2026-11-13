@@ -307,6 +307,63 @@ async function adminBan(req, env, admin) {
   return json(req, { ok: true });
 }
 
+// Daily streak sync. The browser keeps its own copy; signing in lets it follow you to other devices.
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function dayNum(key) {
+  const [y, m, d] = key.split("-").map(Number);
+  return Math.round(Date.UTC(y, m - 1, d) / 864e5);
+}
+
+function cleanStreak(x) {
+  if (!x || typeof x !== "object") return null;
+  const last = typeof x.last === "string" && DAY_RE.test(x.last) ? x.last : "";
+  const int = (v) => Math.max(0, Math.min(100000, Math.floor(Number(v) || 0)));
+  if (!last) return { count: 0, best: int(x.best), last: "", rounds: int(x.rounds) };
+  // a day key can't be in the future (allowing for time zones up to +14h)
+  if (dayNum(last) > Math.floor((Date.now() + 14 * 3600e3) / 864e5)) return null;
+  const rounds = int(x.rounds);
+  // every streak day needs at least one finished round
+  const count = Math.min(int(x.count), rounds, 3650);
+  return { count, best: Math.min(Math.max(int(x.best), count), rounds), last, rounds };
+}
+
+function mergeStreak(a, b) {
+  if (!a) return b;
+  if (!b) return a;
+  const best = Math.max(a.best, b.best);
+  const rounds = Math.max(a.rounds, b.rounds);
+  const live = [a, b].filter((x) => x.last && x.count > 0);
+  let pick = { count: 0, last: a.last > b.last ? a.last : b.last };
+  if (live.length === 1) pick = { count: live[0].count, last: live[0].last };
+  if (live.length === 2) {
+    // Each streak is a run of days ending on its "last" day. If the two runs touch
+    // (practice on two devices), join them into one longer run.
+    const [x, y] = live.map((r) => ({ end: dayNum(r.last), start: dayNum(r.last) - r.count + 1, r }));
+    if (x.start <= y.end + 1 && y.start <= x.end + 1) {
+      const end = Math.max(x.end, y.end);
+      pick = { count: end - Math.min(x.start, y.start) + 1, last: (x.end >= y.end ? x : y).r.last };
+    } else {
+      const later = x.end >= y.end ? x : y;
+      pick = { count: later.r.count, last: later.r.last };
+    }
+  }
+  return { count: pick.count, last: pick.last, best: Math.max(best, pick.count), rounds: Math.max(rounds, pick.count) };
+}
+
+async function syncStreak(req, env, user) {
+  const body = await bodyJson(req);
+  const row = await env.DB.prepare("SELECT count, best, last, rounds FROM streaks WHERE user_id = ?").bind(user.id).first();
+  const incoming = cleanStreak(body.streak);
+  if (body.streak && !incoming) return fail(req, 400, "That streak doesn't look right.");
+  const merged = mergeStreak(row ? cleanStreak(row) : null, incoming) || { count: 0, best: 0, last: "", rounds: 0 };
+  await env.DB.prepare(
+    "INSERT INTO streaks (user_id, count, best, last, rounds, updated_at) VALUES (?, ?, ?, ?, ?, ?) " +
+    "ON CONFLICT(user_id) DO UPDATE SET count = excluded.count, best = excluded.best, last = excluded.last, rounds = excluded.rounds, updated_at = excluded.updated_at"
+  ).bind(user.id, merged.count, merged.best, merged.last, merged.rounds, now()).run();
+  return json(req, { streak: merged, user: { name: user.name } });
+}
+
 // router
 
 export default {
@@ -331,6 +388,7 @@ export default {
 
       // everything below needs a signed-in, non-banned user
       if (!viewer) return fail(req, 401, "Please sign in first.");
+      if (path === "/streak" && req.method === "POST") return await syncStreak(req, env, viewer);
       if (viewer.banned) return fail(req, 403, "This account can't post on the forum.");
 
       if (path === "/threads" && req.method === "POST") return await createThread(req, env, viewer);

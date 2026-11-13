@@ -41,3 +41,12 @@ CREATE TABLE IF NOT EXISTS reports (
   created_at INTEGER NOT NULL,
   UNIQUE(kind, target_id, user_id)
 );
+
+CREATE TABLE IF NOT EXISTS streaks (
+  user_id INTEGER PRIMARY KEY REFERENCES users(id),
+  count INTEGER NOT NULL DEFAULT 0,
+  best INTEGER NOT NULL DEFAULT 0,
+  last TEXT NOT NULL DEFAULT '',
+  rounds INTEGER NOT NULL DEFAULT 0,
+  updated_at INTEGER NOT NULL
+);
