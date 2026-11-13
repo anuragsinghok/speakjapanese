@@ -76,7 +76,7 @@ async function readSession(env, req) {
   let data;
   try { data = JSON.parse(dec.decode(b64urlDecode(m[1]))); } catch { return null; }
   if (!data.uid || data.exp < now()) return null;
-  const user = await env.DB.prepare("SELECT id, name, is_admin, banned FROM users WHERE id = ?").bind(data.uid).first();
+  const user = await env.DB.prepare("SELECT id, name, is_admin, banned, email, email_optin FROM users WHERE id = ?").bind(data.uid).first();
   return user || null;
 }
 
@@ -160,10 +160,13 @@ async function login(env, credential) {
   try { claims = await verifyGoogle(env, credential); } catch { return { error: "Google sign-in failed. Please try again.", status: 401 }; }
   const isAdmin = env.ADMIN_EMAIL && claims.email_verified && String(claims.email).toLowerCase() === String(env.ADMIN_EMAIL).toLowerCase() ? 1 : 0;
   const name = firstName(claims);
+  // keep the Google email with the account (only if Google has verified it)
+  const email = claims.email_verified && typeof claims.email === "string" && claims.email.length <= 254
+    ? claims.email.trim().toLowerCase() : null;
   await env.DB.prepare(
-    `INSERT INTO users (sub, name, is_admin, created_at) VALUES (?1, ?2, ?3, ?4)
-     ON CONFLICT(sub) DO UPDATE SET name = excluded.name, is_admin = excluded.is_admin`
-  ).bind(claims.sub, name, isAdmin, now()).run();
+    `INSERT INTO users (sub, name, is_admin, created_at, email) VALUES (?1, ?2, ?3, ?4, ?5)
+     ON CONFLICT(sub) DO UPDATE SET name = excluded.name, is_admin = excluded.is_admin, email = COALESCE(excluded.email, users.email)`
+  ).bind(claims.sub, name, isAdmin, now(), email).run();
   const user = await env.DB.prepare("SELECT id, name, is_admin, banned FROM users WHERE sub = ?").bind(claims.sub).first();
   if (user.banned) return { error: "This account can't post on the forum.", status: 403 };
   return { token: await makeSession(env, user.id), user: { id: user.id, name: user.name, isAdmin: !!user.is_admin } };
@@ -361,7 +364,16 @@ async function syncStreak(req, env, user) {
     "INSERT INTO streaks (user_id, count, best, last, rounds, updated_at) VALUES (?, ?, ?, ?, ?, ?) " +
     "ON CONFLICT(user_id) DO UPDATE SET count = excluded.count, best = excluded.best, last = excluded.last, rounds = excluded.rounds, updated_at = excluded.updated_at"
   ).bind(user.id, merged.count, merged.best, merged.last, merged.rounds, now()).run();
-  return json(req, { streak: merged, user: { name: user.name } });
+  return json(req, { streak: merged, user: { name: user.name, email: user.email || null, emailOptIn: !!user.email_optin } });
+}
+
+// Promotional emails only go to people who said yes. We keep when they said it.
+async function emailOptIn(req, env, user) {
+  const body = await bodyJson(req);
+  const yes = body.optIn === true;
+  if (yes && !user.email) return fail(req, 400, "No email on this account. Please sign out and sign in again.");
+  await env.DB.prepare("UPDATE users SET email_optin = ?, email_optin_at = ? WHERE id = ?").bind(yes ? 1 : 0, now(), user.id).run();
+  return json(req, { emailOptIn: yes, email: user.email || null });
 }
 
 // router
@@ -380,7 +392,7 @@ export default {
 
       if (path === "/me" && req.method === "GET") {
         if (!viewer) return fail(req, 401, "Not signed in.");
-        return json(req, { user: { id: viewer.id, name: viewer.name, isAdmin: !!viewer.is_admin, banned: !!viewer.banned } });
+        return json(req, { user: { id: viewer.id, name: viewer.name, isAdmin: !!viewer.is_admin, banned: !!viewer.banned, email: viewer.email || null, emailOptIn: !!viewer.email_optin } });
       }
       if (path === "/threads" && req.method === "GET") return await listThreads(req, env, url, viewer);
       const tm = path.match(/^\/threads\/(\d+)$/);
@@ -389,6 +401,7 @@ export default {
       // everything below needs a signed-in, non-banned user
       if (!viewer) return fail(req, 401, "Please sign in first.");
       if (path === "/streak" && req.method === "POST") return await syncStreak(req, env, viewer);
+      if (path === "/email-optin" && req.method === "POST") return await emailOptIn(req, env, viewer);
       if (viewer.banned) return fail(req, 403, "This account can't post on the forum.");
 
       if (path === "/threads" && req.method === "POST") return await createThread(req, env, viewer);

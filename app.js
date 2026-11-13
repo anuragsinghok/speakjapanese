@@ -593,6 +593,45 @@
     $("#acctOut").hidden = !!account;
     if (account) { $("#acctPanel").hidden = true; $("#acctOpen").hidden = false; }
     if (account) $("#acctName").textContent = account.name || "you";
+    renderOptIn();
+  }
+
+  function renderOptIn() {
+    const box = $("#acctOptIn");
+    if (!box) return;
+    const show = !!(account && account.email && CFG.emailEndpoint);
+    box.hidden = !show;
+    if (!show) return;
+    const yes = !!account.emailOptIn;
+    $("#optAsk").hidden = yes;
+    $("#optDone").hidden = !yes;
+    $$(".js-opt-email").forEach((el) => { el.textContent = account.email; });
+  }
+
+  async function optIn() {
+    const btn = $("#optYes");
+    if (!account || !account.email || btn.disabled) return;
+    btn.disabled = true;
+    const old = btn.textContent;
+    btn.textContent = "Saving...";
+    try {
+      const res = await fetch(API + "/email-optin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + authToken() },
+        body: JSON.stringify({ optIn: true }),
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      await subscribeEmail(account.email);
+      account.emailOptIn = true;
+      renderOptIn();
+      toast("Done! You'll get new features and tips by email.");
+      track("sign_up", { method: "google_optin" });
+    } catch {
+      toast("That didn't work. Please try again.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = old;
+    }
   }
 
   let gsiLoading = false;
@@ -760,6 +799,25 @@
   // Email
   const EMAIL_RE = /^[^\s@]+@([^\s@.]+\.)+[^\s@.]{2,}$/;
 
+  // Adds an email to the MailerLite list (the same list as the study schedule form).
+  async function subscribeEmail(email) {
+    const endpoint = String(CFG.emailEndpoint || "").trim();
+    if (!endpoint) throw new Error("no endpoint");
+    const body = new FormData();
+    body.append("fields[email]", email);
+    if (/mailerlite\.com/i.test(endpoint)) {
+      body.append("ml-submit", "1");
+      body.append("anticsrf", "true");
+    } else {
+      body.append("email", email);
+    }
+    const res = await fetch(endpoint, { method: "POST", body, headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json().catch(() => ({}));
+    if (data && data.success === false) throw new Error("rejected");
+    store.set("subscribed", true);
+  }
+
   function setupEmail() {
     const form = $("#emailForm"), input = $("#email"), msg = $("#formMsg"), btn = $("#emailBtn");
     const done = $("#emailDone");
@@ -792,19 +850,7 @@
       const old = btn.textContent;
       btn.textContent = "Sending...";
       try {
-        const body = new FormData();
-        body.append("fields[email]", email);
-        if (/mailerlite\.com/i.test(endpoint)) {
-          body.append("ml-submit", "1");
-          body.append("anticsrf", "true");
-        } else {
-          body.append("email", email);
-        }
-        const res = await fetch(endpoint, { method: "POST", body, headers: { Accept: "application/json" } });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json().catch(() => ({}));
-        if (data && data.success === false) throw new Error("rejected");
-        store.set("subscribed", true);
+        await subscribeEmail(email);
         form.reset();
         say("Done! You can download it below.", "ok");
         showDownload();
@@ -899,6 +945,7 @@
       try { sessionStorage.removeItem("ss:signingIn"); const u = new URL(location.href); u.searchParams.delete("signin"); history.replaceState(null, "", u); } catch { /* ignore */ }
     }
     $("#acctSignOut")?.addEventListener("click", signOut);
+    $("#optYes")?.addEventListener("click", optIn);
 
     const params = new URLSearchParams(location.search);
     const urlLevel = (params.get("level") || "").toUpperCase();

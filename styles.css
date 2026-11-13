@@ -584,3 +584,7 @@ kbd {
 .acct-panel { margin: 8px auto 0; max-width: 26em; }
 #gBtnMain { display: flex; justify-content: center; margin-top: 10px; min-height: 44px; }
 #gBtnMain iframe { color-scheme: light; }
+
+.acct-optin { margin: 12px auto 0; max-width: 26em; }
+.acct-optin .btn { margin-top: 8px; }
+.acct-optin .opt-note { font-size: .74rem !important; margin-top: 6px !important; }

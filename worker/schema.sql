@@ -4,7 +4,10 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT NOT NULL,
   is_admin INTEGER NOT NULL DEFAULT 0,
   banned INTEGER NOT NULL DEFAULT 0,
-  created_at INTEGER NOT NULL
+  created_at INTEGER NOT NULL,
+  email TEXT,
+  email_optin INTEGER NOT NULL DEFAULT 0,
+  email_optin_at INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS threads (
