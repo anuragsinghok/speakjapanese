@@ -565,3 +565,14 @@ kbd {
 .forum-cta { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .forum-cta .btn { text-decoration: none; display: inline-flex; }
 #gBtn iframe { color-scheme: light; }
+
+/* Daily streak */
+.streak { margin: 14px auto 0; padding: 8px 16px; max-width: 30em; width: fit-content; border-radius: 18px; border: 1px solid var(--line); font-size: .84rem; line-height: 1.5; color: var(--ink-3); text-align: center; text-wrap: balance; }
+.streak:empty { display: none; }
+.streak b { color: var(--ink); font-weight: 600; }
+.streak .flame { font-size: 1rem; margin-right: 4px; }
+.streak .flame.off { filter: grayscale(1); opacity: .55; }
+.streak.on { border-color: rgba(201, 138, 92, .4); background: rgba(201, 138, 92, .08); }
+.streak.today { color: var(--ink-2); }
+.streak .best { color: var(--ink-3); font-size: .78rem; margin-left: 4px; white-space: nowrap; }
+.timer .streak { margin: 14px auto 0 !important; }

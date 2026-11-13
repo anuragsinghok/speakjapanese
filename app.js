@@ -512,6 +512,63 @@
     renderTimer();
   }
 
+  // Daily streak: one finished timer round per day keeps it going.
+  // Saved only in this browser (localStorage), like the level and timer length.
+  function dayKey(d = new Date()) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
+  function daysBetween(a, b) {
+    const [y1, m1, d1] = a.split("-").map(Number), [y2, m2, d2] = b.split("-").map(Number);
+    return Math.round((Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 864e5);
+  }
+
+  function getStreak() {
+    const s = store.get("streak", null);
+    if (!s || typeof s.last !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(s.last)) return { count: 0, best: 0, last: "", rounds: 0 };
+    return { count: Number(s.count) || 0, best: Number(s.best) || 0, last: s.last, rounds: Number(s.rounds) || 0 };
+  }
+
+  // 0 = did a round today, 1 = did one yesterday (still alive), more = broken
+  function streakGap(s) { return s.last ? daysBetween(s.last, dayKey()) : Infinity; }
+
+  function recordRound() {
+    const s = getStreak();
+    const gap = streakGap(s);
+    const before = s.count;
+    if (gap === 0) { /* already counted today */ }
+    else if (gap === 1) s.count += 1;
+    else s.count = 1;
+    s.last = dayKey();
+    s.rounds += 1;
+    s.best = Math.max(s.best, s.count);
+    store.set("streak", s);
+    renderStreak();
+    return { s, grew: s.count !== before };
+  }
+
+  function renderStreak() {
+    const el = $("#streak");
+    if (!el) return;
+    const s = getStreak();
+    const gap = streakGap(s);
+    const alive = s.count > 0 && gap <= 1;
+    let html;
+    if (alive && gap === 0) {
+      html = `<span class="flame" aria-hidden="true">🔥</span><b>${s.count} day${s.count === 1 ? "" : "s"}</b> in a row. Done for today.`;
+    } else if (alive) {
+      html = `<span class="flame" aria-hidden="true">🔥</span><b>${s.count} day${s.count === 1 ? "" : "s"}</b> in a row. Finish one round today to keep it.`;
+    } else if (s.best > 0) {
+      html = `<span class="flame off" aria-hidden="true">🔥</span>Finish one round today to start a new streak.`;
+    } else {
+      html = `<span class="flame off" aria-hidden="true">🔥</span>Finish one round to start your daily streak.`;
+    }
+    if (s.best > 1) html += ` <span class="best">Best: ${s.best}</span>`;
+    el.innerHTML = html;
+    el.classList.toggle("on", alive);
+    el.classList.toggle("today", alive && gap === 0);
+  }
+
   function finishTimer() {
     timer.running = false;
     timer.remaining = 0;
@@ -522,7 +579,14 @@
     card.classList.add("done");
     void card.offsetWidth;
     card.classList.add("flash");
-    $("#timerMsg").textContent = "おつかれさま！ Time's up, nice work.";
+    const { s, grew } = recordRound();
+    $("#timerMsg").textContent = grew
+      ? `おつかれさま！ 🔥 ${s.count} day${s.count === 1 ? "" : "s"} in a row.`
+      : "おつかれさま！ Time's up, nice work.";
+    if (grew && [3, 7, 14, 30, 50, 100].includes(s.count)) {
+      setTimeout(() => toast(`🔥 ${s.count} days in a row! すごい！`), 600);
+      track("streak", { days: s.count });
+    }
     $("#timerStart").textContent = "Again";
     $("#timerToggle").textContent = "Restart timer";
     alarm();
@@ -737,6 +801,7 @@
     setupEmail();
     setDuration(Number(store.get("duration", 60)), true);
     loadAnalytics();
+    renderStreak();
 
     const params = new URLSearchParams(location.search);
     const urlLevel = (params.get("level") || "").toUpperCase();
