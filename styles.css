@@ -588,3 +588,22 @@ kbd {
 .acct-optin { margin: 12px auto 0; max-width: 26em; }
 .acct-optin .btn { margin-top: 8px; }
 .acct-optin .opt-note { font-size: .74rem !important; margin-top: 6px !important; }
+
+/* Gatiwo card */
+.gatiwo { position: relative; overflow: hidden; display: block; text-decoration: none; color: var(--ink); border-color: rgba(242, 106, 33, .35); background: linear-gradient(135deg, rgba(242, 106, 33, .12), rgba(255, 248, 238, .03) 55%); transition: transform .2s ease, border-color .2s ease; }
+.gatiwo:hover, .gatiwo:focus-visible { transform: translateY(-2px); border-color: rgba(242, 106, 33, .7); }
+.gatiwo > span:not(.g-glow) { position: relative; display: block; }
+.gatiwo .g-glow { position: absolute; inset: auto -40px -60px auto; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(242, 106, 33, .28), transparent 70%); pointer-events: none; }
+.g-top { display: flex !important; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.g-label { font-size: .78rem; color: var(--ink-3); }
+.g-langs { display: flex; gap: 4px; }
+.g-langs span { font-size: .7rem; padding: 2px 7px; border-radius: 99px; border: 1px solid var(--line); color: var(--ink-2); }
+.g-name { margin-top: 10px; font-family: var(--serif); font-size: 1.6rem; font-weight: 600; display: flex !important; align-items: center; gap: 10px; }
+.g-mark { display: inline-grid !important; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #f26a21; color: #fff; font-family: var(--sans); font-size: 1.05rem; font-weight: 700; font-style: italic; }
+.g-desc { margin-top: 6px; font-size: .93rem; color: var(--ink-2); line-height: 1.55; }
+.g-chips { display: flex !important; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.g-chips span { font-size: .76rem; padding: 4px 10px; border-radius: 99px; background: rgba(255, 248, 238, .06); color: var(--ink-2); }
+.g-cta { margin-top: 14px; display: inline-flex !important; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 99px; background: #f26a21; color: #fff; font-weight: 600; font-size: .92rem; }
+.gatiwo:hover .g-cta span { transform: translateX(3px); }
+.g-cta span { transition: transform .2s ease; }
+@media (prefers-reduced-motion: reduce) { .gatiwo, .g-cta span { transition: none; } .gatiwo:hover { transform: none; } }

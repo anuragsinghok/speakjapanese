@@ -5,7 +5,7 @@ import json, html, os
 from datetime import date
 
 SITE = "https://jlptspin.com"
-V = "22"
+V = "24"
 words = json.load(open("words.json", encoding="utf-8"))
 LEVELS = ["N5", "N4", "N3", "N2", "N1"]
 INFO = {

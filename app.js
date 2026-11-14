@@ -946,6 +946,7 @@
     }
     $("#acctSignOut")?.addEventListener("click", signOut);
     $("#optYes")?.addEventListener("click", optIn);
+    $$("[data-out]").forEach((a) => a.addEventListener("click", () => track("outbound_click", { link: a.dataset.out })));
 
     const params = new URLSearchParams(location.search);
     const urlLevel = (params.get("level") || "").toUpperCase();
