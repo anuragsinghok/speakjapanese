@@ -607,3 +607,5 @@ kbd {
 .gatiwo:hover .g-cta span { transform: translateX(3px); }
 .g-cta span { transition: transform .2s ease; }
 @media (prefers-reduced-motion: reduce) { .gatiwo, .g-cta span { transition: none; } .gatiwo:hover { transform: none; } }
+.g-logo { display: inline-flex !important; align-items: center; padding: 9px 16px; border-radius: 14px; background: #fcf5e3; box-shadow: 0 6px 20px rgba(0, 0, 0, .25); }
+.g-logo img { display: block; width: 150px; height: auto; }
